@@ -48,12 +48,12 @@ const CreateDiscordBot = () => {
         groups.push(data)
     }
     bot.GetGroup = async (guild) => {
-        const query = await db("SELECT paradise_id, paid FROM bots WHERE discord_id = " + guild + " LIMIT 1")
+        const query = await db("SELECT paradise_id, paid, settings FROM bots WHERE discord_id = " + guild + " LIMIT 1")
         if (!query || query.length == 0) return
         const paidTo = new Date(query[0].paid)
         let paid = true
         if (new Date() > paidTo) paid = false
-        return { id: query[0].paradise_id, paid }
+        return { id: query[0].paradise_id, paid, paidTo: query[0].paid, settings: JSON.parse(query[0].settings) }
     }
     bot.GetActiveGroups = () => {
         return bots
