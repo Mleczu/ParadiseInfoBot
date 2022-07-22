@@ -170,7 +170,6 @@ const CreateDiscordBot = () => {
 
 const Load = async (first) => {
     if (first) await CreateDiscordBot()
-    logger.info('test deploy')
     logger.info("Ładowanie botów...")
     const data = await db("SELECT * FROM bots WHERE paid > NOW() AND enabled = 1")
     for (const d of data) {
