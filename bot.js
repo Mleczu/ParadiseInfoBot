@@ -119,6 +119,7 @@ class Instance {
     async ProcessLog(log) {
         const type = this.GetLogType(log)
         const author = await this.bot.paradise.GetUserByName(log.member_name)
+        if (!author) return
         const isUserIgnored = await this.IsUserIgnored(author)
         if (isUserIgnored) return;
         let data = [log.log]
