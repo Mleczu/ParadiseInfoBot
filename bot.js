@@ -92,6 +92,7 @@ class Instance {
     }
 
     async ProcessLogs() {
+        console.log("skanowanie logów dla " + this.group)
         const data = await this.GetLogs();
         for (const log of data) {
             const checkStatus = await this.CheckIfLogWasProcessed(log.id)
