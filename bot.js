@@ -152,6 +152,7 @@ class Instance {
         }
         const table = tempSettings.payouts[type]
         if (table[rank]) return table[rank]
+        if (table["*"]) return table["*"]
         if (type == "export") return { count: 0, percent: true }
         return { count: 50, percent: true }
     }
