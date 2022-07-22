@@ -3,6 +3,7 @@ const Database = require('./database/database')
 const Discord = require('discord.js')
 const path = require('path')
 const fs = require('fs')
+const cron = require('cron').CronJob
 const logger = require('./logger')
 const { MakeRequest } = require('./functions')
 const { replyEmbed } = require('./prettyReply')
@@ -179,6 +180,30 @@ const Load = async (first) => {
         const instance = await new Instance().Create(d, bot)
         bots.push(instance)
     }
+    const dataHistoryJob = new cron('0,30 * * * *', async () => {
+        const data = await db("SELECT users.* FROM users INNER JOIN bots ON users.gid = bots.paradise_id WHERE bots.enabled = 1")
+        if (!data || data.length == 0) return;
+        for (const d of data) {
+            const jsonData = {
+                cash: d.cash,
+                count: {
+                    artifact: d.count_artifact,
+                    import: d.count_import,
+                    import_fail: d.count_importfail,
+                    export: d.count_export,
+                    pawnshop: d.count_pawnshop
+                },
+                earn: {
+                    artifact: d.earn_artifact,
+                    import: d.earn_import,
+                    export: d.earn_export,
+                    pawnshop: d.earn_pawnshop
+                }
+            }
+            db("INSERT INTO data_history (`gid`, `uid`, `info`) VALUES (" + d.gid + ", " + d.uid + ", '" + JSON.stringify(jsonData) + "')")
+        }
+    })
+    dataHistoryJob.start()
 }
 
 Load(true)
