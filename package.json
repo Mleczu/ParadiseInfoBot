@@ -1,0 +1,28 @@
+{
+  "name": "paradiseinfobot",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "migration": "node ./database/migration",
+    "start": "node ./loader",
+    "dev": "nodemon ./loader"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "@discordjs/rest": "^1.0.0",
+    "bluebird": "^3.7.2",
+    "colors": "^1.4.0",
+    "cron": "^2.1.0",
+    "discord-api-types": "^0.36.2",
+    "discord.js": "^14.0.3",
+    "mysql": "^2.18.1",
+    "node-fetch": "^2.6.1",
+    "ping": "^0.4.2"
+  },
+  "devDependencies": {
+    "nodemon": "^2.0.19"
+  }
+}

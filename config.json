@@ -1,0 +1,17 @@
+{
+    "paradise": {
+        "gif": "https://cdn.discordapp.com/icons/446370773452455949/a_f0e073cf3c3bc1a4a206839f6551b3c4.gif?size=4096"
+    },
+    "database": {
+        "host": "130.61.148.12",
+        "user": "paradiseinfo",
+        "password": "paramleczudisebrzysiuinfo",
+        "database": "paradise_core"
+    },
+    "discord": {
+        "ownerId": "166576531982778369",
+        "clientId": "972557064142487602",
+        "token": "OTcyNTU3MDY0MTQyNDg3NjAy.GI14Rl.tS_xu5MBLev_OQgX2NvxYq6L-Xg5q76BTQrofQ",
+        "color": "#c077ce"
+    }
+}
