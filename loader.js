@@ -45,7 +45,7 @@ const CreateDiscordBot = () => {
     bot.login(config.discord.token)
     bot.database = db
     bot.PublishOrganisationData = (data) => {
-        groups = groups.filter(g => g.id != data.id)
+        groups = groups.filter(g => g.id != data.id && g.time > (new Date().getTime() - (1.5 * 60 * 1000)))
         groups.push(data)
     }
     bot.GetGroup = async (guild) => {

@@ -48,6 +48,7 @@ class Instance {
 
     PublishInformation() {
         this.bot.PublishOrganisationData({
+            time: new Date().getTime(),
             id: this.group,
             url: this.groupUrl,
             logs: this.ProcessedCache.length,
