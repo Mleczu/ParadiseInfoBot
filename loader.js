@@ -180,7 +180,7 @@ const Load = async (first) => {
         const instance = await new Instance().Create(d, bot)
         bots.push(instance)
     }
-    if (first) {
+    if (first) {    
         const dataHistoryJob = new cron('0,30 * * * *', async () => {
             const data = await db("SELECT users.* FROM users INNER JOIN bots ON users.gid = bots.paradise_id WHERE bots.enabled = 1")
             if (!data || data.length == 0) return;
@@ -217,6 +217,19 @@ const Load = async (first) => {
             }
         })
         scanPaymentsJob.start()
+        const scanPaidJob = new cron('* * * * *', async () => {
+            const data = await db("SELECT * FROM bots WHERE paid > NOW() AND enabled = 1")
+            if (!data || data.length == 0) return;
+            for (const d of data) {
+                const b = bots.filter(c => c.group == d.paradise_id)
+                console.log('bot - ' + d.paradise_id)
+                if (b.length !== 0) return;
+                console.log('bot jest oplacony ale nie jest stworzony, tworzenie')
+                const instance = await new Instance().Create(d, bot)
+                bots.push(instance)
+            }
+        })
+        scanPaidJob.start()
     }
 }
 
