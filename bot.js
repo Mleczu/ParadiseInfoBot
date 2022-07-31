@@ -63,7 +63,6 @@ class Instance {
         for (const i of this.intervalsList) {
             clearInterval(i)
         }
-        console.log("Wyczyszczono intervale")
     }
 
     GetInstance() {

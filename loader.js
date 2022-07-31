@@ -210,7 +210,7 @@ const Load = async (first) => {
             if (!data || data.length == 0) return;
             for (const d of data) {
                 const b = bots.filter(c => c.group == d.paradise_id)
-                if (b.length == 0) return;
+                if (b.length == 0) break;
                 b[0].DestroyIntervals()
                 delete b[0]
                 bots = bots.filter(c => c.group != d.paradise_id)
@@ -222,9 +222,7 @@ const Load = async (first) => {
             if (!data || data.length == 0) return;
             for (const d of data) {
                 const b = bots.filter(c => c.group == d.paradise_id)
-                console.log('bot - ' + d.paradise_id)
-                if (b.length !== 0) return;
-                console.log('bot jest oplacony ale nie jest stworzony, tworzenie')
+                if (b.length !== 0) break;
                 const instance = await new Instance().Create(d, bot)
                 bots.push(instance)
             }
