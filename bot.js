@@ -19,6 +19,8 @@ class Instance {
     constructor() {
         this.token
         this.ProcessedCache = []
+        this.intervalsList = []
+        this.cronJobsList = []
         this.data
         this.bot
         this.group
@@ -35,11 +37,12 @@ class Instance {
         this.settings = JSON.parse(this.data.settings)
         this.isEnabled = true
         await this.Login()
-        setInterval(this.ProcessLogs.bind(this), 60 * 1000)
-        setInterval(this.Login.bind(this), 1 * 60 * 60 * 1000)
-        setInterval(this.PublishInformation.bind(this), 30 * 1000)
+        this.intervalsList.push(setInterval(this.ProcessLogs.bind(this), 60 * 1000))
+        this.intervalsList.push(setInterval(this.Login.bind(this), 1 * 60 * 60 * 1000))
+        this.intervalsList.push(setInterval(this.PublishInformation.bind(this), 30 * 1000))
         const magazineTask = new cron('0 1 * * * *', this.CheckMagazine.bind(this));
         magazineTask.start()
+        this.cronJobsList.push(magazineTask)
         return this
     }
 
@@ -50,6 +53,16 @@ class Instance {
             logs: this.ProcessedCache.length,
             enabled: this.isEnabled
         })
+    }
+
+    DestroyIntervals() {
+        for (const j of this.cronJobsList) {
+            j.stop()
+        }
+        for (const i of this.intervalsList) {
+            clearInterval(i)
+        }
+        console.log("Wyczyszczono intervale")
     }
 
     GetInstance() {

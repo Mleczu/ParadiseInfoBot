@@ -209,13 +209,10 @@ const Load = async (first) => {
             const data = await db("SELECT * FROM bots WHERE paid < NOW() AND enabled = 1")
             if (!data || data.length == 0) return;
             for (const d of data) {
-                console.log(d.paradise_id)
-                console.log(bots[0].group)
                 const b = bots.filter(c => c.group == d.paradise_id)
-                console.log(b)
                 if (b.length == 0) return;
-                console.log(b[0])
-                console.log("jest bot ktory juz wygasl")
+                b[0].DestroyIntervals()
+                delete b[0]
             }
         })
         scanPaymentsJob.start()
