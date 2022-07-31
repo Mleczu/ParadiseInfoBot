@@ -213,6 +213,7 @@ const Load = async (first) => {
                 if (b.length == 0) return;
                 b[0].DestroyIntervals()
                 delete b[0]
+                bots = bots.filter(c => c.group != d.paradise_id)
             }
         })
         scanPaymentsJob.start()
