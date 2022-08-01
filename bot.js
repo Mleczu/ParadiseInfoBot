@@ -106,12 +106,19 @@ class Instance {
 
     async ProcessLogs() {
         const data = await this.GetLogs();
-        for (const log of data) {
-            const checkStatus = await this.CheckIfLogWasProcessed(log.id)
-            if (!checkStatus) {
-                await this.MarkLogAsProcessed(log.id)
-                await this.ProcessLog(log)
-            };
+        try {
+            for (const log of data) {
+                const checkStatus = await this.CheckIfLogWasProcessed(log.id)
+                if (!checkStatus) {
+                    await this.MarkLogAsProcessed(log.id)
+                    await this.ProcessLog(log)
+                };
+            }
+            console.log("nie ma bledu przy procesownaiu dla grupy " + this.group)
+        } catch (e) {
+            console.log("Blad przy procesowaniu logow dla grupy " + this.group)
+            console.log(e)
+            console.log(data)
         }
     }
 
