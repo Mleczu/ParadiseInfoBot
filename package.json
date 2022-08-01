@@ -2,7 +2,7 @@
   "name": "paradiseinfobot",
   "version": "1.0.0",
   "description": "",
-  "main": "index.js",
+  "main": "loader.js",
   "scripts": {
     "migration": "node ./database/migration",
     "start": "node ./loader",
@@ -20,6 +20,7 @@
     "discord.js": "^14.0.3",
     "mysql": "^2.18.1",
     "node-fetch": "^2.6.1",
+    "path": "^0.12.7",
     "ping": "^0.4.2"
   },
   "devDependencies": {

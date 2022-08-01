@@ -205,7 +205,7 @@ const Load = async (first) => {
             }
         })
         dataHistoryJob.start()
-        const scanPaymentsJob = new cron('* * * * *', async () => {
+        const scanNotPaidJob = new cron('* * * * *', async () => {
             const data = await db("SELECT * FROM bots WHERE paid < NOW() AND enabled = 1")
             if (!data || data.length == 0) return;
             for (const d of data) {
@@ -216,7 +216,7 @@ const Load = async (first) => {
                 bots = bots.filter(c => c.group != d.paradise_id)
             }
         })
-        scanPaymentsJob.start()
+        scanNotPaidJob.start()
         const scanPaidJob = new cron('* * * * *', async () => {
             const data = await db("SELECT * FROM bots WHERE paid > NOW() AND enabled = 1")
             if (!data || data.length == 0) return;
