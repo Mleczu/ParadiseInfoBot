@@ -162,13 +162,8 @@ class Instance {
         const userList = await MakeRequest(this.token, "https://ucp.paradise-rpg.pl/api/group/" + this.group, true)
         if (!userList) return "Not found"
         const user = userList.group.members.filter(u => u.account.id == id)[0] || { rank: "Not found"}
-        try {
-            let rank = user.rank.trim()
-            return rank
-        } catch {
-            let rank = user.rank
-            return rank
-        }
+        let rank = user.rank
+        return rank
     }
     
     async GetPaymentModifier(user, type) {
@@ -179,6 +174,8 @@ class Instance {
         tempSettings = JSON.parse(tempSettings[0].settings)
         if (tempSettings.perUserRankSystem) {
             rank = rank.split("-")[0].trim()
+        } else {
+            rank = rank.trim()
         }
         const table = tempSettings.payouts[type]
         if (table[rank]) return table[rank]
