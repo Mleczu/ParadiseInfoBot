@@ -46,7 +46,7 @@ class Instance {
         const hotDealsTask = new cron('0 1 * * * *', this.CheckHotDeals.bind(this));
         hotDealsTask.start()
         this.cronJobsList.push(hotDealsTask)
-        const warehouseLogTask = new cron('0 1 * * * *', this.LogWarehousePrices.bind(this));
+        const warehouseLogTask = new cron('0 * * * * *', this.LogWarehousePrices.bind(this));
         warehouseLogTask.start()
         this.cronJobsList.push(warehouseLogTask)
         const updateSettingsTask = new cron('0 0 * * * *', this.UpdateSettings.bind(this));
@@ -296,9 +296,12 @@ class Instance {
     }
 
     async LogWarehousePrices() {
+        console.log(`${this.group} => start - ${!this.settings.discord.channels.price_change}`)
         if (!this.settings.discord.channels.price_change) return;
+        console.log(`${this.group} => 2 - ${this.settings.discord.channels.price_change.length == 0}`)
         if (this.settings.discord.channels.price_change.length == 0) return;
         const data = await MakeRequest(this.token, this.groupUrl + "/warehouses", true)
+        console.log(`${this.group} => 3 - ${!data}`)
         if (!data || !data.warehouse) return
         if (!data.warehouse.warehouse) return
         const vehicles = data.warehouse.warehouse.vehicles
@@ -308,7 +311,7 @@ class Instance {
             veh.push({ name: vehicleName, value: NumberWithSpaces(v.vehicle_price) + "$", inline: true })
         }
         if (veh.length == 0) return;
-        this.bot.SendActionLog(this.group, "Zmiana cen - Wszystkie oferty", "price_change", veh)
+        // this.bot.SendActionLog(this.group, "Zmiana cen - Wszystkie oferty", "price_change", veh)
     }
 
     async CheckHotDeals() {
