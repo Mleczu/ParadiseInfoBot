@@ -49,6 +49,9 @@ class Instance {
         const warehouseLogTask = new cron('0 1 * * * *', this.LogWarehousePrices.bind(this));
         warehouseLogTask.start()
         this.cronJobsList.push(warehouseLogTask)
+        const updateSettingsTask = new cron('0 0 * * * *', this.UpdateSettings.bind(this));
+        updateSettingsTask.start()
+        this.cronJobsList.push(updateSettingsTask)
         return this
     }
 
@@ -288,7 +291,7 @@ class Instance {
     }
 
     async LogWarehousePrices() {
-        if (!this.settings.discord.channels.hot_deals || this.settings.discord.channels.hot_deals == 0) return;
+        if (!this.settings.discord.channels.price_change || this.settings.discord.channels.price_change == 0) return;
         const data = await MakeRequest(this.token, this.groupUrl + "/warehouses", true)
         if (!data || !data.warehouse) return
         if (!data.warehouse.warehouse) return
@@ -322,6 +325,12 @@ class Instance {
         this.bot.SendActionLog(this.group, "Zmiana cen - Dobre oferty", "hot_deals", hotDeals)
     }
 
+    async UpdateSettings() {
+        const data = await this.bot.database("SELECT settings FROM bots WHERE paradise_id = " + this.group + " LIMIT 1")
+        if (!data || data.length == 0) return;
+        const newSettings = JSON.parse(data[0].settings)
+        this.settings = newSettings
+    }
 }
 
 module.exports = Instance
