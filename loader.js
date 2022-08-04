@@ -143,6 +143,10 @@ const CreateDiscordBot = () => {
                 ])
                 break;
             }
+            case "hot_deals": {
+                embed.setAuthor({ name: author, iconURL: bot.user.displayAvatarURL() }).addFields(data)
+                break;
+            }
         }
         channel.send({embeds: [embed]})
     }

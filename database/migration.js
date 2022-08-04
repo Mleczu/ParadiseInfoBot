@@ -10,6 +10,7 @@ try {
     con.query("CREATE TABLE `data_history` (`id` INT(10) UNSIGNED NOT NULL AUTO_INCREMENT, `gid` INT(10) UNSIGNED NOT NULL, `uid` INT(10) UNSIGNED NOT NULL, `date` DATETIME NOT NULL DEFAULT current_timestamp(), `info` LONGTEXT NOT NULL COLLATE 'utf8mb4_bin', PRIMARY KEY (`id`) USING BTREE) COLLATE='utf8mb4_general_ci' ENGINE=InnoDB;")
     con.query("CREATE TABLE `ignored_users` (`id` INT(10) UNSIGNED NOT NULL AUTO_INCREMENT, `gid` INT(10) UNSIGNED NOT NULL, `uid` INT(10) UNSIGNED NOT NULL, PRIMARY KEY (`id`) USING BTREE) COLLATE='utf8mb4_general_ci' ENGINE=InnoDB;")
     con.query("CREATE TABLE `imports` ( `id` INT(10) UNSIGNED NOT NULL AUTO_INCREMENT, `gid` INT(10) UNSIGNED NOT NULL, `uid` INT(10) UNSIGNED NOT NULL, `vehicle` VARCHAR(255) NOT NULL DEFAULT '' COLLATE 'utf8mb4_general_ci', PRIMARY KEY (`id`) USING BTREE) COLLATE='utf8mb4_general_ci' ENGINE=InnoDB;")
+    con.query("CREATE TABLE `warehouse_notify` (`id` INT(10) UNSIGNED NOT NULL AUTO_INCREMENT, `gid` INT(10) UNSIGNED NOT NULL, `discord_id` VARCHAR(50) NOT NULL COLLATE 'utf8mb4_general_ci', `channel_id` VARCHAR(50) NOT NULL COLLATE 'utf8mb4_general_ci', `message_id` VARCHAR(50) NULL DEFAULT NULL COLLATE 'utf8mb4_general_ci', PRIMARY KEY (`id`) USING BTREE) COLLATE='utf8mb4_general_ci' ENGINE=InnoDB;")
 } catch (e) {
     logger.error('Error while creating migration')
     throw e

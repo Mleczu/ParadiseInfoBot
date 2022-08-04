@@ -1,5 +1,5 @@
 const logger = require('./logger')
-const { MakeRequest, CheckIfUserHasProfile, CreateUserProfile, GetWarehouseMapping } = require('./functions')
+const { MakeRequest, CheckIfUserHasProfile, CreateUserProfile, GetWarehouseNameMapping, GetWarehousePriceMapping } = require('./functions')
 const cron = require('cron').CronJob;
 
 let logTypes = {
@@ -43,6 +43,9 @@ class Instance {
         const magazineTask = new cron('0 1 * * * *', this.CheckMagazine.bind(this));
         magazineTask.start()
         this.cronJobsList.push(magazineTask)
+        const hotDealsTask = new cron('0 1 * * * *', this.CheckHotDeals.bind(this));
+        hotDealsTask.start()
+        this.cronJobsList.push(hotDealsTask)
         return this
     }
 
@@ -270,7 +273,7 @@ class Instance {
         if (!data || !data.warehouse) return
         if (!data.warehouse.warehouse) return
         const vehicles = data.warehouse.warehouse.vehicles
-        const vehiclesNames = vehicles.map(v => GetWarehouseMapping(v.vehicle_model))
+        const vehiclesNames = vehicles.map(v => GetWarehouseNameMapping(v.vehicle_model))
         const databaseVehicles = await this.bot.database("SELECT * FROM imports WHERE gid = " + this.group + " ORDER BY id DESC")
         if (!databaseVehicles || databaseVehicles.length == 0) return
         const databaseVehiclesNames = databaseVehicles.map(v => v.vehicle)
@@ -279,6 +282,26 @@ class Instance {
             logger.warn("Usuwanie pojazdu " + v + " z bazy danych organizacji " + this.group)
             await this.bot.database("DELETE FROM imports WHERE gid = " + this.group + " AND vehicle = '" + v + "' ORDER BY id ASC LIMIT 1")
         }
+    }
+
+    async CheckHotDeals() {
+        if (!this.settings.discord.channels.hot_deals || this.settings.discord.channels.hot_deals == 0) return;
+        const data = await MakeRequest(this.token, this.groupUrl + "/warehouses", true)
+        if (!data || !data.warehouse) return
+        if (!data.warehouse.warehouse) return
+        const vehicles = data.warehouse.warehouse.vehicles
+        let hotDeals = []
+        for (const v of vehicles) {
+            const vehicleName = GetWarehouseNameMapping(v.vehicle_model)
+            const goodPrice = GetWarehousePriceMapping(vehicleName)
+            if (goodPrice) {
+                if (v.vehicle_price > (goodPrice * 0.1)) {
+                    hotDeals.push({ name: vehicleName, value: NumberWithSpaces(v.vehicle_price) + "$", inline: true })
+                }
+            }
+        }
+        if (hotDeals.length == 0) return;
+        this.bot.SendActionLog(this.group, "Zmiana cen", "hot_deals", hotDeals)
     }
 
 }

@@ -1,6 +1,6 @@
 const fetch = require('node-fetch')
 
-const warehouseMappings = {
+const warehouseNameMappings = {
     "400":"Landstalker",
     "401":"Bravura",
     "402":"Buffalo",
@@ -220,11 +220,45 @@ const warehouseMappings = {
     "2006": "Bulldog",
     "2007": "Garbus",
     "2008": "Baron"
-
 }
 
-const GetWarehouseMapping = (id) => {
-    return warehouseMappings[`${id}`] || "unknown"
+const warehousePriceMappings = {
+    "Reaper": 13500000,
+    "Fusion": 10000000,
+    "Venom": 7000000,
+    "Wraith": 5600000,
+    "Rattler": 5000000,
+    "Bulldog": 4700000,
+    "Diablo": 3900000,
+    "Magnum": 3100000,
+    "Hammerhead": 2750000,
+    "Torero": 2000000,
+    "Turismo": 2100000,
+    "Bullet": 1900000,
+    "Infernus": 1800000,
+    "Soprano": 1350000,
+    "Titan": 1350000,
+    "Walnus": 1150000,
+    "Banshee": 1045440,
+    "Cheetah": 1000000,
+    "Sultan": 875000,
+    "Elegy": 800000,
+    "Hotknife": 750000,
+    "Comet": 707000,
+    "Jester": 625000,
+    "Uranus": 500000,
+    "Super GT": 460000,
+    "Flash": 425000,
+    "ZR-350": 400000,
+    "Huntley": 240000,
+}
+
+const GetWarehouseNameMapping = (id) => {
+    return warehouseNameMappings[`${id}`] || "unknown"
+}
+
+const GetWarehousePriceMapping = (name) => {
+    return warehousePriceMappings[name]
 }
 
 const MakeRequest = async (token, path, authorization, body) => {
@@ -283,4 +317,4 @@ const NumberWithSpaces = (x) => {
     return x.toString().replace(/\B(?=(\d{3})+(?!\d))/g, " ");
 }
 
-module.exports = { MakeRequest, CheckIfUserHasProfile, CreateUserProfile, NumberWithSpaces, GetWarehouseMapping }
+module.exports = { MakeRequest, CheckIfUserHasProfile, CreateUserProfile, NumberWithSpaces, GetWarehouseNameMapping, GetWarehousePriceMapping }
