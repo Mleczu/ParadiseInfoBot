@@ -97,7 +97,9 @@ const CreateDiscordBot = () => {
         const channelId = JSON.parse(query[0].settings).discord.channels[type]
         if (!channelId || channelId.length == 0) return
         const channel = await server.channels.fetch(channelId)
+        if (type == 'price_change') console.log(`${group} => ${channel.name}`)
         if (!channel) return
+        if (type == 'price_change') console.log(`${group} => 5`)
         const embed = new Discord.EmbedBuilder().setColor(config.discord.color).setThumbnail(config.paradise.gif).setTimestamp()
         switch (type) {
             case "pawnshop": {
@@ -153,6 +155,7 @@ const CreateDiscordBot = () => {
                 break;
             }
         }
+        if (type == 'price_change') console.log(`${group} => 6`)
         channel.send({embeds: [embed]})
     }
     bot.logger = logger
