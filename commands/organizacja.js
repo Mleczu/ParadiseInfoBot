@@ -20,6 +20,7 @@ module.exports = {
             { name: "**Kanał: Rozpoczęcie artefaktu**", value: `<#${gid.settings.discord.channels.artifact_start}>`, inline: true },
             { name: "**Kanał: Artefakty**", value: `<#${gid.settings.discord.channels.artifact_end}>`, inline: true },
             { name: "**Kanał: Lombard**", value: `<#${gid.settings.discord.channels.pawnshop}>`, inline: true },
+            { name: "**Kanał: Dobre ceny**", value: `<#${gid.settings.discord.channels.hot_deals}>`, inline: true },
             
         ]
         return interaction.reply({ embeds: [bot.prettyReply("**Informajce o organizacji**", interaction).addFields(fields)], ephemeral: true })
