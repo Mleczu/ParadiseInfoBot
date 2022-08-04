@@ -295,22 +295,30 @@ class Instance {
     }
 
     async LogWarehousePrices() {
-        if (!this.settings.discord.channels.price_change || this.settings.discord.channels.price_change == 0) return;
+        console.log("-----------------------------")
+        console.log("grupa - " + this.group)
+        console.log("kanal - " + this.settings.discord.channels.price_change)
+        
+        if (!this.settings.discord.channels.price_change) return;
         const data = await MakeRequest(this.token, this.groupUrl + "/warehouses", true)
+        console.log("data - " + data)
         if (!data || !data.warehouse) return
+        console.log("warehouse - " + data.warehouse.warehouse)
         if (!data.warehouse.warehouse) return
         const vehicles = data.warehouse.warehouse.vehicles
+        console.log("auta - " + vehicles.length)
         let veh = []
         for (const v of vehicles) {
             const vehicleName = GetWarehouseNameMapping(v.vehicle_model)
             veh.push({ name: vehicleName, value: NumberWithSpaces(v.vehicle_price) + "$", inline: true })
         }
+        console.log("koncowa ilosc aut - " + veh.length)
         if (veh.length == 0) return;
         this.bot.SendActionLog(this.group, "Zmiana cen - Wszystkie oferty", "price_change", veh)
     }
 
     async CheckHotDeals() {
-        if (!this.settings.discord.channels.hot_deals || this.settings.discord.channels.hot_deals == 0) return;
+        if (!this.settings.discord.channels.hot_deals) return;
         const data = await MakeRequest(this.token, this.groupUrl + "/warehouses", true)
         if (!data || !data.warehouse) return
         if (!data.warehouse.warehouse) return
