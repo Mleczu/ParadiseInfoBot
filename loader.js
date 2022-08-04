@@ -141,7 +141,7 @@ const CreateDiscordBot = () => {
                     {name: "Wartość pojazdu", value: `${data.price}$`},
                     {name: "Zdobyte doświadczenie", value: `${data.experience} EXP`}
                 ])
-                channel.send({ content: "@everyone" })
+                channel.send({ content: "@everyone 🚙" })
                 break;
             }
             case "hot_deals": {
