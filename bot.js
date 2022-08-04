@@ -43,7 +43,7 @@ class Instance {
         const magazineTask = new cron('0 1 * * * *', this.CheckMagazine.bind(this));
         magazineTask.start()
         this.cronJobsList.push(magazineTask)
-        const hotDealsTask = new cron('0 * * * * *', this.CheckHotDeals.bind(this));
+        const hotDealsTask = new cron('0 1 * * * *', this.CheckHotDeals.bind(this));
         hotDealsTask.start()
         this.cronJobsList.push(hotDealsTask)
         return this
@@ -295,7 +295,7 @@ class Instance {
             const vehicleName = GetWarehouseNameMapping(v.vehicle_model)
             const goodPrice = GetWarehousePriceMapping(vehicleName)
             if (goodPrice) {
-                if (v.vehicle_price > (goodPrice * 0.1)) {
+                if (v.vehicle_price > goodPrice) {
                     hotDeals.push({ name: vehicleName, value: NumberWithSpaces(v.vehicle_price) + "$", inline: true })
                 }
             }
