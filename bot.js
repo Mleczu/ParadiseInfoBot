@@ -46,7 +46,7 @@ class Instance {
         const hotDealsTask = new cron('0 1 * * * *', this.CheckHotDeals.bind(this));
         hotDealsTask.start()
         this.cronJobsList.push(hotDealsTask)
-        const warehouseLogTask = new cron('0 10 * * * *', this.LogWarehousePrices.bind(this));
+        const warehouseLogTask = new cron('0 12 * * * *', this.LogWarehousePrices.bind(this));
         warehouseLogTask.start()
         this.cronJobsList.push(warehouseLogTask)
         const updateSettingsTask = new cron('0 0 * * * *', this.UpdateSettings.bind(this));
@@ -298,6 +298,8 @@ class Instance {
         console.log("-----------------------------")
         console.log("grupa - " + this.group)
         console.log("kanal - " + this.settings.discord.channels.price_change)
+        console.log(!this.settings.discord.channels.price_change)
+        console.log(this.settings.discord.channels.price_change.length == 0)
         if (!this.settings.discord.channels.price_change || this.settings.discord.channels.price_change.length == 0) return;
         const data = await MakeRequest(this.token, this.groupUrl + "/warehouses", true)
         console.log("data - " + data)
@@ -313,7 +315,7 @@ class Instance {
         }
         console.log("koncowa ilosc aut - " + veh.length)
         if (veh.length == 0) return;
-        this.bot.SendActionLog(this.group, "Zmiana cen - Wszystkie oferty", "price_change", veh)
+        // this.bot.SendActionLog(this.group, "Zmiana cen - Wszystkie oferty", "price_change", veh)
     }
 
     async CheckHotDeals() {
