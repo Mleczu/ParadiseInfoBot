@@ -299,7 +299,7 @@ class Instance {
         if (!this.settings.discord.channels.price_change) return;
         if (this.settings.discord.channels.price_change.length == 0) return;
         const data = await MakeRequest(this.token, this.groupUrl + "/warehouses", true)
-        if (group == 727) console.log(data.warehouse)
+        if (this.group == 727) console.log(data.warehouse)
         if (!data || !data.warehouse) return
         if (!data.warehouse.warehouse) return
         const vehicles = data.warehouse.warehouse.vehicles
