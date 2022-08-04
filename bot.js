@@ -342,12 +342,13 @@ class Instance {
     async AddBalanceHistory(count, out) {
         try {
             const date = new Date()
-            const existCheck = await this.bot.database("SELECT id FROM balance_history WHERE `date` = date('" + date.toISOString() + "') AND gid = " + this.group)
+            const dateString = [date.getfullYear(), date.getMonth(), date.getDate()].join("-")
+            const existCheck = await this.bot.database("SELECT id FROM balance_history WHERE `date` = '" + dateString + "' AND gid = " + this.group)
             if (!existCheck) return;
             if (existCheck.length == 0) {
-                await this.bot.database("INSERT INTO `balance_history` (`gid`, `date`, `in`, `out`) VALUES ('" + this.group + "', date('" + date.toISOString().split("T")[0] + "'), '0', '0');")
+                await this.bot.database("INSERT INTO `balance_history` (`gid`, `date`, `in`, `out`) VALUES ('" + this.group + "', '" + dateString + "', '0', '0');")
             }
-            this.bot.database("UPDATE `balance_history` SET `" + ((out) ? "out" : "in") + "` = `" + ((out) ? "out" : "in") + "` + " + count + " WHERE `date` = date('" + date.toISOString().split("T")[0] + "') AND gid = " + this.group)
+            this.bot.database("UPDATE `balance_history` SET `" + ((out) ? "out" : "in") + "` = `" + ((out) ? "out" : "in") + "` + " + count + " WHERE `date` = '" + dateString + "' AND gid = " + this.group)
         } catch (e) {
             console.log(e)
         }
