@@ -46,7 +46,7 @@ class Instance {
         const hotDealsTask = new cron('0 1 * * * *', this.CheckHotDeals.bind(this));
         hotDealsTask.start()
         this.cronJobsList.push(hotDealsTask)
-        const warehouseLogTask = new cron('0 13 * * * *', this.LogWarehousePrices.bind(this));
+        const warehouseLogTask = new cron('0 18 * * * *', this.LogWarehousePrices.bind(this));
         warehouseLogTask.start()
         this.cronJobsList.push(warehouseLogTask)
         const updateSettingsTask = new cron('0 0 * * * *', this.UpdateSettings.bind(this));
@@ -296,24 +296,21 @@ class Instance {
 
     async LogWarehousePrices() {
         console.log("-----------------------------")
-        console.log("grupa - " + this.group)
-        console.log("kanal - " + this.settings.discord.channels.price_change)
-        console.log(!this.settings.discord.channels.price_change)
-        console.log(this.settings.discord.channels.price_change.length == 0)
-        if (!this.settings.discord.channels.price_change || this.settings.discord.channels.price_change.length == 0) return;
+        if (!this.settings.discord.channels.price_change) return;
+        if (this.settings.discord.channels.price_change.length == 0) return;
         const data = await MakeRequest(this.token, this.groupUrl + "/warehouses", true)
-        console.log("data - " + data)
+        console.log("grupa - " + this.group + " - " + "data - " + data)
         if (!data || !data.warehouse) return
-        console.log("warehouse - " + data.warehouse.warehouse)
+        console.log("grupa - " + this.group + " - " + "warehouse - " + data.warehouse.warehouse)
         if (!data.warehouse.warehouse) return
         const vehicles = data.warehouse.warehouse.vehicles
-        console.log("auta - " + vehicles.length)
+        console.log("grupa - " + this.group + " - " + "auta - " + vehicles.length)
         let veh = []
         for (const v of vehicles) {
             const vehicleName = GetWarehouseNameMapping(v.vehicle_model)
             veh.push({ name: vehicleName, value: NumberWithSpaces(v.vehicle_price) + "$", inline: true })
         }
-        console.log("koncowa ilosc aut - " + veh.length)
+        console.log("grupa - " + this.group + " - " + "koncowa ilosc aut - " + veh.length)
         if (veh.length == 0) return;
         // this.bot.SendActionLog(this.group, "Zmiana cen - Wszystkie oferty", "price_change", veh)
     }
