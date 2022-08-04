@@ -13,7 +13,7 @@ module.exports = {
         }),
 	async execute(bot, interaction) {
         if (interaction.user.id != config.discord.ownerId) return interaction.reply({ embeds: [bot.prettyReply("**Hola hola, nie masz do tego uprawnień.**", interaction)], ephemeral: true })
-        const data = await db("SELECT * FROM bots WHERE paid > NOW() AND enabled = 1")
+        const data = await bot.database("SELECT * FROM bots WHERE paid > NOW() AND enabled = 1")
         if (!data || data.length == 0) return interaction.reply({ embeds: [bot.prettyReply("Nie znaleziono organizacji!", interaction)], ephemeral: true })
         let failedMsg = []
         const embed = bot.prettyReply(interaction.options.getString("wiadomosc"), interaction)
