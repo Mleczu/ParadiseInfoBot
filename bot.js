@@ -46,7 +46,7 @@ class Instance {
         const hotDealsTask = new cron('0 1 * * * *', this.CheckHotDeals.bind(this));
         hotDealsTask.start()
         this.cronJobsList.push(hotDealsTask)
-        const warehouseLogTask = new cron('0 * * * * *', this.LogWarehousePrices.bind(this));
+        const warehouseLogTask = new cron('0 1 * * * *', this.LogWarehousePrices.bind(this));
         warehouseLogTask.start()
         this.cronJobsList.push(warehouseLogTask)
         const updateSettingsTask = new cron('0 0 * * * *', this.UpdateSettings.bind(this));
