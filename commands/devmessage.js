@@ -23,7 +23,7 @@ module.exports = {
             if (!guild || !channel_id || channel_id.length == 0) {
                 failedMsg.push(d.paradise_id)
             } else {
-                const channel = g.channels.cache.get(channel_id)
+                const channel = guild.channels.cache.get(channel_id)
                 if (!channel) {
                     failedMsg.push(d.paradise_id)
                 } else {
