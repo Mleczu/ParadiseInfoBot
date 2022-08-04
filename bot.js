@@ -301,7 +301,7 @@ class Instance {
             }
         }
         if (hotDeals.length == 0) return;
-        this.bot.SendActionLog(this.group, "Zmiana cen", "hot_deals", hotDeals)
+        this.bot.SendActionLog(this.group, "Zmiana cen - Dobre oferty", "hot_deals", hotDeals)
     }
 
 }
