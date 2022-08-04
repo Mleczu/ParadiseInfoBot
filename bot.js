@@ -46,6 +46,9 @@ class Instance {
         const hotDealsTask = new cron('0 1 * * * *', this.CheckHotDeals.bind(this));
         hotDealsTask.start()
         this.cronJobsList.push(hotDealsTask)
+        const warehouseLogTask = new cron('0 1 * * * *', this.LogWarehousePrices.bind(this));
+        warehouseLogTask.start()
+        this.cronJobsList.push(warehouseLogTask)
         return this
     }
 
@@ -282,6 +285,21 @@ class Instance {
             logger.warn("Usuwanie pojazdu " + v + " z bazy danych organizacji " + this.group)
             await this.bot.database("DELETE FROM imports WHERE gid = " + this.group + " AND vehicle = '" + v + "' ORDER BY id ASC LIMIT 1")
         }
+    }
+
+    async LogWarehousePrices() {
+        if (!this.settings.discord.channels.hot_deals || this.settings.discord.channels.hot_deals == 0) return;
+        const data = await MakeRequest(this.token, this.groupUrl + "/warehouses", true)
+        if (!data || !data.warehouse) return
+        if (!data.warehouse.warehouse) return
+        const vehicles = data.warehouse.warehouse.vehicles
+        let veh = []
+        for (const v of vehicles) {
+            const vehicleName = GetWarehouseNameMapping(v.vehicle_model)
+            veh.push({ name: vehicleName, value: NumberWithSpaces(v.vehicle_price) + "$", inline: true })
+        }
+        if (veh.length == 0) return;
+        this.bot.SendActionLog(this.group, "Zmiana cen - Wszystkie oferty", "price_change", veh)
     }
 
     async CheckHotDeals() {

@@ -148,6 +148,10 @@ const CreateDiscordBot = () => {
                 channel.send({ content: "@everyone" })
                 break;
             }
+            case "price_change": {
+                embed.setAuthor({ name: author, iconURL: bot.user.displayAvatarURL() }).addFields(data)
+                break;
+            }
         }
         channel.send({embeds: [embed]})
     }
