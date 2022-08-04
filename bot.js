@@ -310,12 +310,14 @@ class Instance {
             const vehicleName = GetWarehouseNameMapping(v.vehicle_model)
             veh.push({ name: vehicleName, value: NumberWithSpaces(v.vehicle_price) + "$", inline: true })
         }
+        console.log(`${this.group} => 4 - ${!veh.length}`)
         if (veh.length == 0) return;
-        // this.bot.SendActionLog(this.group, "Zmiana cen - Wszystkie oferty", "price_change", veh)
+        this.bot.SendActionLog(this.group, "Zmiana cen - Wszystkie oferty", "price_change", veh)
     }
 
     async CheckHotDeals() {
         if (!this.settings.discord.channels.hot_deals) return;
+        if (this.settings.discord.channels.hot_deals.length == 0) return;
         const data = await MakeRequest(this.token, this.groupUrl + "/warehouses", true)
         if (!data || !data.warehouse) return
         if (!data.warehouse.warehouse) return
