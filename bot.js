@@ -299,7 +299,6 @@ class Instance {
         if (!this.settings.discord.channels.price_change) return;
         if (this.settings.discord.channels.price_change.length == 0) return;
         const data = await MakeRequest(this.token, this.groupUrl + "/warehouses", true)
-        if (this.group == 727) console.log(data)
         if (!data || !data.warehouse) return
         if (!data.warehouse.warehouse) return
         const vehicles = data.warehouse.warehouse.vehicles
@@ -309,7 +308,7 @@ class Instance {
             veh.push({ name: vehicleName, value: NumberWithSpaces(v.vehicle_price) + "$", inline: true })
         }
         if (veh.length == 0) return;
-        // this.bot.SendActionLog(this.group, "Zmiana cen - Wszystkie oferty", "price_change", veh)
+        this.bot.SendActionLog(this.group, "Zmiana cen - Wszystkie oferty", "price_change", veh)
     }
 
     async CheckHotDeals() {
