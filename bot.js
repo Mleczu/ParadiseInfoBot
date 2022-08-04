@@ -194,6 +194,7 @@ class Instance {
     async AddCash(user, count, type) {
         const profileCheck = await CheckIfUserHasProfile(this.bot, this.group, user)
         if (!profileCheck) await CreateUserProfile(this.bot, this.group, user)
+        AddBalanceHistory(count, false)
         const modifier = await this.GetPaymentModifier(user, type)
         count = ((modifier.percent) ? Math.floor((count * (modifier.count / 100))) : modifier.count)
         await this.bot.database("UPDATE `users` SET cash = cash + " + count + ", earn_" + type + " = earn_" + type + " + " + count + " WHERE uid = " + user.id + " AND gid = " + this.group + " LIMIT 1")
@@ -266,6 +267,7 @@ class Instance {
                 if (hasCash[0].cash < cash) {
                     query = "0"
                 }
+                AddBalanceHistory(cash, true)
                 await this.bot.database("UPDATE users SET cash = " + query + " WHERE uid = " + user.id + " AND gid = " + this.group + " LIMIT 1")
                 break;
             }
@@ -330,6 +332,19 @@ class Instance {
         if (!data || data.length == 0) return;
         const newSettings = JSON.parse(data[0].settings)
         this.settings = newSettings
+    }
+
+    async AddBalanceHistory(count, out) {
+        try {
+            const existCheck = await this.bot.database("SELECT id FROM balance_history WHERE `date` = date('" + new Date().toISOString() + "') AND gid = " + this.group)
+            if (!existCheck) return;
+            if (existCheck.length == 0) {
+                await this.bot.database("INSERT INTO `balance_history` (`gid`, `date`, `in`, `out`) VALUES ('" + this.group + "', date('" + new Date().toISOString() + "'), '0', '0');")
+            }
+            this.bot.database("UPDATE `balance_history` SET " + ((out) ? "out" : "in") + " = " + ((out) ? "out" : "in") + " + " + count + " WHERE `date` = date('" + new Date().toISOString() + "') AND gid = " + this.group)
+        } catch (e) {
+            console.log(e)
+        }
     }
 }
 
