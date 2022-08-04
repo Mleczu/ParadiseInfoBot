@@ -1,5 +1,5 @@
 const logger = require('./logger')
-const { MakeRequest, CheckIfUserHasProfile, CreateUserProfile, GetWarehouseNameMapping, GetWarehousePriceMapping } = require('./functions')
+const { MakeRequest, NumberWithSpaces, CheckIfUserHasProfile, CreateUserProfile, GetWarehouseNameMapping, GetWarehousePriceMapping } = require('./functions')
 const cron = require('cron').CronJob;
 
 let logTypes = {
