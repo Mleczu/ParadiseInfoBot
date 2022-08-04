@@ -296,12 +296,10 @@ class Instance {
     }
 
     async LogWarehousePrices() {
-        console.log(`${this.group} => start - ${!this.settings.discord.channels.price_change}`)
         if (!this.settings.discord.channels.price_change) return;
-        console.log(`${this.group} => 2 - ${this.settings.discord.channels.price_change.length == 0}`)
         if (this.settings.discord.channels.price_change.length == 0) return;
         const data = await MakeRequest(this.token, this.groupUrl + "/warehouses", true)
-        console.log(`${this.group} => 3 - ${!data}`)
+        if (group == 727) console.log(data.warehouse)
         if (!data || !data.warehouse) return
         if (!data.warehouse.warehouse) return
         const vehicles = data.warehouse.warehouse.vehicles
