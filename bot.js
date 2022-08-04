@@ -298,8 +298,7 @@ class Instance {
         console.log("-----------------------------")
         console.log("grupa - " + this.group)
         console.log("kanal - " + this.settings.discord.channels.price_change)
-        
-        if (!this.settings.discord.channels.price_change) return;
+        if (!this.settings.discord.channels.price_change || this.settings.discord.channels.price_change.length == 0) return;
         const data = await MakeRequest(this.token, this.groupUrl + "/warehouses", true)
         console.log("data - " + data)
         if (!data || !data.warehouse) return
