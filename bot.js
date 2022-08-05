@@ -342,7 +342,7 @@ class Instance {
     async AddBalanceHistory(count, out) {
         try {
             const date = new Date()
-            const dateString = [date.getfullYear(), date.getMonth(), date.getDate()].join("-")
+            const dateString = [date.getFullYear(), date.getMonth(), date.getDate()].join("-")
             const existCheck = await this.bot.database("SELECT id FROM balance_history WHERE `date` = '" + dateString + "' AND gid = " + this.group)
             if (!existCheck) return;
             if (existCheck.length == 0) {
