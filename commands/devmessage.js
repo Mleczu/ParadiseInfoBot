@@ -16,7 +16,7 @@ module.exports = {
         const data = await bot.database("SELECT * FROM bots WHERE paid > NOW() AND enabled = 1")
         if (!data || data.length == 0) return interaction.reply({ embeds: [bot.prettyReply("Nie znaleziono organizacji!", interaction)], ephemeral: true })
         let failedMsg = []
-        const embed = bot.prettyReply(interaction.options.getString("wiadomosc").replace("%nl%", "\\n"), interaction)
+        const embed = bot.prettyReply(interaction.options.getString("wiadomosc"), interaction)
         for (const d of data) {
             const guild = bot.guilds.cache.get(d.discord_id)
             const channel_id = JSON.parse(d.settings).discord.channels.news
