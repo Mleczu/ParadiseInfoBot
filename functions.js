@@ -222,37 +222,6 @@ const warehouseNameMappings = {
     "2008": "Baron"
 }
 
-const warehousePriceMappings = {
-    "Reaper": 13500000,
-    "Fusion": 10000000,
-    "Venom": 7000000,
-    "Wraith": 5600000,
-    "Rattler": 5000000,
-    "Bulldog": 4700000,
-    "Diablo": 3900000,
-    "Magnum": 3100000,
-    "Hammerhead": 2750000,
-    "Torero": 2000000,
-    "Turismo": 2100000,
-    "Bullet": 1900000,
-    "Infernus": 1800000,
-    "Soprano": 1350000,
-    "Titan": 1350000,
-    "Walnus": 1150000,
-    "Banshee": 1045440,
-    "Cheetah": 1000000,
-    "Sultan": 875000,
-    "Elegy": 800000,
-    "Hotknife": 750000,
-    "Comet": 707000,
-    "Jester": 625000,
-    "Uranus": 500000,
-    "Super GT": 460000,
-    "Flash": 425000,
-    "ZR-350": 400000,
-    "Huntley": 240000,
-}
-
 const GetWarehouseNameMapping = (id) => {
     return warehouseNameMappings[`${id}`] || "unknown"
 }
@@ -317,4 +286,17 @@ const NumberWithSpaces = (x) => {
     return x.toString().replace(/\B(?=(\d{3})+(?!\d))/g, " ");
 }
 
-module.exports = { MakeRequest, CheckIfUserHasProfile, CreateUserProfile, NumberWithSpaces, GetWarehouseNameMapping, GetWarehousePriceMapping }
+const makeRequiredValues = (json) => {
+    if (!json.discord) json.discord = {}
+    if (!json.discord.channels) json.discord.channels = {}
+    if (!json.discord.pings) json.discord.pings = {}
+    if (!json.client) json.client = {}
+    if (!json.payouts) json.payouts = {}
+    if (!json.payouts.import) json.payouts.import = {}
+    if (!json.payouts.export) json.payouts.export = {}
+    if (!json.payouts.artifact) json.payouts.artifact = {}
+    if (!json.payouts.pawnshop) json.payouts.pawnshop = {}
+    return json
+}
+
+module.exports = { MakeRequest, CheckIfUserHasProfile, CreateUserProfile, NumberWithSpaces, GetWarehouseNameMapping, GetWarehousePriceMapping, makeRequiredValues }

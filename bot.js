@@ -1,5 +1,5 @@
 const logger = require('./logger')
-const { MakeRequest, NumberWithSpaces, CheckIfUserHasProfile, CreateUserProfile, GetWarehouseNameMapping, GetWarehousePriceMapping } = require('./functions')
+const { MakeRequest, NumberWithSpaces, CheckIfUserHasProfile, CreateUserProfile, GetWarehouseNameMapping, makeRequiredValues } = require('./functions')
 const cron = require('cron').CronJob;
 
 let logTypes = {
@@ -29,29 +29,34 @@ class Instance {
         this.isEnabled
     }
 
+    createCronJob(interval, job) {
+        const t = new cron(interval, job.bind(this));
+        t.start()
+        this.cronJobsList.push(t)
+    }
+
+    createInterval(job, interval) {
+        this.intervalsList.push(setInterval(job.bind(this), interval))
+    }
+
     async Create(datarec, botrec) {
         this.data = datarec;
         this.bot = botrec;
         this.group = this.data.paradise_id
         this.groupUrl = "https://ucp.paradise-rpg.pl/api/group/" + this.data.paradise_id
-        this.settings = JSON.parse(this.data.settings)
+        this.settings = makeRequiredValues(JSON.parse(this.data.settings))
         this.isEnabled = true
+        this.paid = this.data.paid
         await this.Login()
-        this.intervalsList.push(setInterval(this.ProcessLogs.bind(this), 60 * 1000))
-        this.intervalsList.push(setInterval(this.Login.bind(this), 1 * 60 * 60 * 1000))
-        this.intervalsList.push(setInterval(this.PublishInformation.bind(this), 30 * 1000))
-        const magazineTask = new cron('0 1 * * * *', this.CheckMagazine.bind(this));
-        magazineTask.start()
-        this.cronJobsList.push(magazineTask)
-        const hotDealsTask = new cron('0 1 * * * *', this.CheckHotDeals.bind(this));
-        hotDealsTask.start()
-        this.cronJobsList.push(hotDealsTask)
-        const warehouseLogTask = new cron('0 1 * * * *', this.LogWarehousePrices.bind(this));
-        warehouseLogTask.start()
-        this.cronJobsList.push(warehouseLogTask)
-        const updateSettingsTask = new cron('0 0 * * * *', this.UpdateSettings.bind(this));
-        updateSettingsTask.start()
-        this.cronJobsList.push(updateSettingsTask)
+        this.createInterval(this.ProcessLogs, 60 * 1000)
+        this.createInterval(this.Login, 1 * 60 * 60 * 1000)
+        this.createInterval(this.PublishInformation, 30 * 1000)
+        this.createCronJob('0 1 * * * *', this.CheckMagazine);
+        this.createCronJob('0 1 * * * *', this.CheckHotDeals);
+        this.createCronJob('0 1 * * * *', this.LogWarehousePrices);
+        this.createCronJob('0 0 * * * *', this.UpdateSettings);
+        this.createCronJob('30 0 * * * *', this.Ping1DayLeft);
+        this.createCronJob('30 0 * * * *', this.Ping3DaysLeft);
         return this
     }
 
@@ -308,7 +313,7 @@ class Instance {
             veh.push({ name: vehicleName, value: NumberWithSpaces(v.vehicle_price) + "$", inline: true })
         }
         if (veh.length == 0) return;
-        this.bot.SendActionLog(this.group, "Zmiana cen - Wszystkie oferty", "price_change", veh)
+        this.bot.SendActionLog(this.group, "Zmiana cen - Wszystkie oferty", "price_change",  { fields: veh })
     }
 
     async CheckHotDeals() {
@@ -321,7 +326,10 @@ class Instance {
         let hotDeals = []
         for (const v of vehicles) {
             const vehicleName = GetWarehouseNameMapping(v.vehicle_model)
-            const goodPrice = GetWarehousePriceMapping(vehicleName)
+            const vd = await this.bot.database("SELECT * FROM export_prices WHERE gid = " + this.group + " AND model = '" + vehicleName + "' LIMIT 1")
+            if (!vd) continue;
+            if (vd.length == 0) continue;
+            const goodPrice = vd[0].price
             if (goodPrice) {
                 if (v.vehicle_price > goodPrice) {
                     hotDeals.push({ name: vehicleName, value: NumberWithSpaces(v.vehicle_price) + "$", inline: true })
@@ -329,14 +337,15 @@ class Instance {
             }
         }
         if (hotDeals.length == 0) return;
-        this.bot.SendActionLog(this.group, "Zmiana cen - Dobre oferty", "hot_deals", hotDeals)
+        this.bot.SendActionLog(this.group, "Zmiana cen - Dobre oferty", "hot_deals", { fields: hotDeals, mention: (this.settings.discord.pings.switchPingGoodDeals || false) })
     }
 
     async UpdateSettings() {
-        const data = await this.bot.database("SELECT settings FROM bots WHERE paradise_id = " + this.group + " LIMIT 1")
+        const data = await this.bot.database("SELECT settings, paid FROM bots WHERE paradise_id = " + this.group + " LIMIT 1")
         if (!data || data.length == 0) return;
-        const newSettings = JSON.parse(data[0].settings)
+        const newSettings = makeRequiredValues(JSON.parse(data[0].settings))
         this.settings = newSettings
+        this.paid = new Date(data[0].paid)
     }
 
     async AddBalanceHistory(count, out) {
@@ -352,6 +361,30 @@ class Instance {
         } catch (e) {
             console.log(e)
         }
+    }
+
+    async Ping1DayLeft() {
+        if (!this.settings.discord.pings.switchPing1DayLeft) return
+        const pingDay = new Date(this.paid)
+        pingDay.setDate(pingDay.getDate() - 1)
+        const nowDay = new Date()
+        if (nowDay.getDate() != pingDay.getDate()) return
+        if (nowDay.getMonth() != pingDay.getMonth()) return
+        if (nowDay.getFullYear() != pingDay.getFullYear()) return
+        if (nowDay.getHours() != this.paid.getHours())
+        this.bot.SendActionLog(this.group, "Opłata", "news", { message: "**Bot wygasa za** `1 dzień` " })
+    }
+
+    async Ping3DaysLeft() {
+        if (!this.settings.discord.pings.switchPing3DaysLeft) return
+        const pingDay = new Date(this.paid)
+        pingDay.setDate(pingDay.getDate() - 3)
+        const nowDay = new Date()
+        if (nowDay.getDate() != pingDay.getDate()) return
+        if (nowDay.getMonth() != pingDay.getMonth()) return
+        if (nowDay.getFullYear() != pingDay.getFullYear()) return
+        if (nowDay.getHours() != this.paid.getHours())
+        this.bot.SendActionLog(this.group, "Opłata", "news", { message: "**Bot wygasa za** `3 dni` " })
     }
 }
 

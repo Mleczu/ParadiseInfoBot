@@ -71,7 +71,7 @@ const CreateDiscordBot = () => {
         let user = data.filter(d => d.login.toLowerCase() == name.toLowerCase())
         if (user.length == 0) return
         user = user[0]
-        user.ttl = Date.now() + (1 * 60 * 1000)
+        user.ttl = Date.now() + (5 * 60 * 1000)
         bot.paradise.cache.push(user)
         return user
     }
@@ -84,7 +84,7 @@ const CreateDiscordBot = () => {
             login: data.account.login,
             rank: data.account.rank,
             skin: data.account.skin,
-            ttl: Date.now() + (1 * 60 * 1000)
+            ttl: Date.now() + (5 * 60 * 1000)
         }
         bot.paradise.cache.push(user)
         return user
@@ -144,12 +144,16 @@ const CreateDiscordBot = () => {
                 break;
             }
             case "hot_deals": {
-                embed.setAuthor({ name: author, iconURL: bot.user.displayAvatarURL() }).addFields(data)
-                channel.send({ content: "@everyone" })
+                embed.setAuthor({ name: author, iconURL: bot.user.displayAvatarURL() }).addFields(data.fields)
+                if (data.mention) channel.send({ content: "@everyone" })
                 break;
             }
             case "price_change": {
-                embed.setAuthor({ name: author, iconURL: bot.user.displayAvatarURL() }).addFields(data)
+                embed.setAuthor({ name: author, iconURL: bot.user.displayAvatarURL() }).addFields(data.fields)
+                break;
+            }
+            case "news": {
+                embed.setAuthor({ name: author, iconURL: bot.user.displayAvatarURL() }).setDescription(data.message)
                 break;
             }
         }
@@ -185,7 +189,7 @@ const Load = async (first) => {
     logger.info("Ładowanie botów...")
     const data = await db("SELECT * FROM bots WHERE paid > NOW() AND enabled = 1")
     for (const d of data) {
-        if (bots.map(b => b.data.id).includes(d.id)) break;
+        if (bots.map(b => b.data.id).includes(d.id)) continue;
         const instance = await new Instance().Create(d, bot)
         bots.push(instance)
     }
@@ -219,7 +223,7 @@ const Load = async (first) => {
             if (!data || data.length == 0) return;
             for (const d of data) {
                 const b = bots.filter(c => c.group == d.paradise_id)
-                if (b.length == 0) break;
+                if (b.length == 0) continue;
                 b[0].DestroyIntervals()
                 delete b[0]
                 bots = bots.filter(c => c.group != d.paradise_id)
@@ -231,7 +235,7 @@ const Load = async (first) => {
             if (!data || data.length == 0) return;
             for (const d of data) {
                 const b = bots.filter(c => c.group == d.paradise_id)
-                if (b.length !== 0) break;
+                if (b.length !== 0) continue;
                 const instance = await new Instance().Create(d, bot)
                 bots.push(instance)
             }
