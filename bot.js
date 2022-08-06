@@ -9,6 +9,7 @@ let logTypes = {
     artifact_start: new RegExp(/Rozpoczęcie akcji artefakt/),
     artifact_end: new RegExp(/Znalezienie artefaktu wartego \$(\d*) i (\d*) EXP/),
     export: new RegExp(/Eksport pojazdu (.*?) za \$(\d*) oraz (\d*) EXP/),
+    export_fail: new RegExp(/Eksport pojazdu za \$(\d*) zakończony porażką./),
     member_add: new RegExp(/Dodanie (.*?) do grupy/),
     rank_change: new RegExp(/zmiana rangi członka (.*?) na (.*?)/),
     transfer_receive: new RegExp(/Wpłata na konto w kwocie \$(\d*)/),
@@ -51,12 +52,12 @@ class Instance {
         this.createInterval(this.ProcessLogs, 60 * 1000)
         this.createInterval(this.Login, 1 * 60 * 60 * 1000)
         this.createInterval(this.PublishInformation, 30 * 1000)
-        this.createCronJob('0 1 * * * *', this.CheckMagazine);
         this.createCronJob('0 1 * * * *', this.CheckHotDeals);
         this.createCronJob('0 1 * * * *', this.LogWarehousePrices);
         this.createCronJob('0 0 * * * *', this.UpdateSettings);
         this.createCronJob('30 0 * * * *', this.Ping1DayLeft);
         this.createCronJob('30 0 * * * *', this.Ping3DaysLeft);
+        // this.createCronJob('0 1 * * * *', this.Ping1DayWarehouse);
         return this
     }
 
@@ -279,10 +280,14 @@ class Instance {
                 await this.bot.database("UPDATE users SET cash = " + query + " WHERE uid = " + user.id + " AND gid = " + this.group + " LIMIT 1")
                 break;
             }
+            case "export_fail": {
+                await this.CheckWarehouse()
+                break;
+            }
         }
     }
     
-    async CheckMagazine() {
+    async CheckWarehouse() {
         const dbData = await this.bot.database("SELECT * FROM imports WHERE gid = " + this.group + " ORDER BY id DESC")
         if (!dbData || dbData.length == 0) return;
         const data = await MakeRequest(this.token, this.groupUrl + "/warehouses", true)
