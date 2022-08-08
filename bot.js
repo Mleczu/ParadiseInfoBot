@@ -6,6 +6,7 @@ let logTypes = {
     pawnshop: new RegExp(/W lombardzie \'(.*?)\' umieszczono (\d*) przedmiotów o wartości \$(\d*)/),
     import_success: new RegExp(/Import pojazdu (.*?) o kwocie \$(\d*) do magazynu/),
     import_fail: new RegExp(/Import pojazdu o kwocie \$(\d*) zakończony porażką./),
+    import_fail_second: new RegExp(/Import zakończony porażką./),
     artifact_start: new RegExp(/Rozpoczęcie akcji artefakt/),
     artifact_end: new RegExp(/Znalezienie artefaktu wartego \$(\d*) i (\d*) EXP/),
     export: new RegExp(/Eksport pojazdu (.*?) za \$(\d*) oraz (\d*) EXP/),
@@ -227,8 +228,12 @@ class Instance {
             }
             case "import_fail": {
                 this.IncreaseCount(author, "importfail")
-                this.bot.SendActionLog(this.group, author, type, { price: data[1] })
+                this.bot.SendActionLog(this.group, author, type, { price: data[1] + "$" })
                 break;
+            }
+            case "import_fail_second": {
+                this.IncreaseCount(author, "importfail")
+                this.bot.SendActionLog(this.group, author, "import_fail", { price: "Brak danych" })
             }
             case "artifact__start": {
                 this.bot.SendActionLog(this.group, author, type, {})

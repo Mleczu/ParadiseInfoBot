@@ -118,7 +118,7 @@ const CreateDiscordBot = () => {
             case "import_fail": {
                 embed.setAuthor({ name: author.login, iconURL: bot.user.displayAvatarURL() }).addFields([
                     {name: "Pojazd", value: "IMPORT NIEUDANY"},
-                    {name: "Wartość pojazdu", value: `${data.price}$`}
+                    {name: "Wartość pojazdu", value: `${data.price}`}
                 ])
                 break;
             }
