@@ -50,9 +50,9 @@ class Instance {
         this.isEnabled = true
         this.paid = this.data.paid
         await this.Login()
-        this.createInterval(this.ProcessLogs, 60 * 1000)
         this.createInterval(this.Login, 1 * 60 * 60 * 1000)
         this.createInterval(this.PublishInformation, 30 * 1000)
+        this.createCronJob('0 * * * * *', this.ProcessLogs)
         this.createCronJob('0 1 * * * *', this.CheckHotDeals);
         this.createCronJob('0 1 * * * *', this.LogWarehousePrices);
         this.createCronJob('0 0 * * * *', this.UpdateSettings);
@@ -113,7 +113,7 @@ class Instance {
     async GetLogs() {
         if (!this.token) return logger.warn("Token not found")
         let body = {
-            dateFrom: new Date(Date.now() - (6 * 60 * 60 * 1000)).toISOString(),
+            dateFrom: new Date(Date.now() - (24 * 60 * 60 * 1000)).toISOString(),
             dateTo: new Date().toISOString()
         }
         let result = await MakeRequest(this.token, this.groupUrl + "/logs", true, body)
