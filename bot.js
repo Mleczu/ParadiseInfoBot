@@ -2,6 +2,7 @@ const logger = require('./logger')
 const { MakeRequest, NumberWithSpaces, CheckIfUserHasProfile, CreateUserProfile, GetWarehouseNameMapping, makeRequiredValues } = require('./functions')
 const cron = require('cron').CronJob;
 const moment = require('moment');
+const fetch = require('node-fetch')
 
 let logTypes = {
     pawnshop: new RegExp(/W lombardzie \'(.*?)\' umieszczono (\d*) przedmiotów o wartości \$(\d*)/),
