@@ -9,7 +9,7 @@ module.exports = {
     	.setDMPermission(false)
         .setDefaultMemberPermissions(Discord.PermissionFlagsBits.Administrator),
 	async execute(bot, interaction) {
-        await interaction.deferReply({ ephemeral: true })
+        await interaction.deferReply()
         const gid = await bot.GetGroup(interaction.guild.id)
         if (!gid) return interaction.editReply({ embeds: [bot.prettyReply("**Hola hola, nie wykryto organizacji dla tego serwera.**", interaction)], ephemeral: true })
         if (!gid.paid) return interaction.editReply({ embeds: [bot.prettyReply("**Hola hola, bot dla tej organizacji nie jest opłacony.**", interaction)], ephemeral: true })
