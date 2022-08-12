@@ -20,6 +20,6 @@ module.exports = {
             const user = await bot.paradise.GetUserById(d.uid) || { login: "Brak danych" }
             payoutData.push("**" + user.login + "** - " + NumberWithSpaces(d.cash))
         }
-        return interaction.editReply({ embeds: [bot.prettyReply("**Lista wypłat**\n\n" + payoutData.join("\n"), interaction)] })
+        return interaction.editReply({ embeds: [bot.prettyReply("**Lista wypłat**\n\n" + payoutData.join("\n"), interaction)], ephemeral: false })
     },
 };
