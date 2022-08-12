@@ -1,0 +1,76 @@
+@layout('layouts/dashboard')
+@section('content')
+<div class="container-fluid">
+    <h3 class="text-dark mb-4">Ceny exportowe</h3>
+    <div class="row mb-3">
+        <div class="col-lg-8">
+            <div class="card shadow mb-5">
+                <div class="card-header py-3">
+                    <p class="text-primary m-0 fw-bold">Lista cen exportowych</p>
+                </div>
+                <div class="card-body">
+                    <div id="removeVehicleAlert"></div>
+                    <div class="table-responsive table mt-2" id="dataTable" role="grid" aria-describedby="dataTable_info">
+                        <table class="table my-0" id="dataTable">
+                            <thead>
+                                <tr>
+                                    <th class="col-md-3">Model</th>
+                                    <th class="col-md-3">Cena minimalna</th>
+                                    <th class="col-md-1">Akcje</th>
+                                </tr>
+                            </thead>
+                            <tbody id="dataTableBody" class="align-middle">
+                            </tbody>
+                            <tfoot>
+                                <tr>
+                                    <th>Model</th>
+                                    <th>Cena minimalna</th>
+                                    <th>Akcje</th>
+                                </tr>
+                            </tfoot>
+                        </table>
+                    </div>
+                    <div class="row">
+                        <div class="col-md-6 align-self-center">
+                            <p id="dataTable_info" class="dataTables_info" role="status" aria-live="polite">Pokazuje <span id="dataTable_resultCount">?</span> wyników</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col">
+            <div class="card shadow">
+                <div class="card-header py-3">
+                    <p class="text-primary m-0 fw-bold">Dodaj pojazd</p>
+                </div>
+                <div class="card-body">
+                    <form>
+                        <div id="submitVehicleAlert"></div>
+                        <div class="row">
+                            <div class="col">
+                                <div class="mb-3"><label class="form-label" for="editorModel"><strong>Model pojazdu</strong></label>
+                                <select id="editorModel" class="form-control" data-live-search="true">
+                                    @each(v in vehicleList)
+                                        <option value="{{ v }}">{{ v }}</option>
+                                    @endeach
+                                </select>
+                            </div>
+                            <div class="col">
+                                <div class="mb-3"><label class="form-label" for="editorPrice"><strong>Cena minimalna</strong></label>
+                                <input class="form-control" type="number" id="editorPrice" min="0" placeholder="Brak"></div>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col mb-3 d-flex">
+                                <div class="col mb-3"><button class="btn btn-primary btn-sm" type="submit" id="submitVehicle">Zapisz</button></div>
+                                <div class="col mb-3 d-flex justify-content-end"><button class="btn btn-primary btn-sm" type="submit" id="loadDefaultVehicles">Wczytaj domyślne</button></div>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<script src="/assets/js/exportPrices.js"></script>
+@endsection

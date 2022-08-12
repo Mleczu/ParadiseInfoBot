@@ -13,10 +13,12 @@
   "license": "ISC",
   "dependencies": {
     "@discordjs/rest": "^1.0.0",
+    "axios": "^0.27.2",
     "bluebird": "^3.7.2",
     "colors": "^1.4.0",
     "cookie-session": "^2.0.0",
     "cron": "^2.1.0",
+    "cross-fetch": "^3.1.5",
     "crypto-js": "^4.1.1",
     "discord-api-types": "^0.36.2",
     "discord.js": "^14.0.3",
@@ -25,7 +27,6 @@
     "express-session": "^1.17.3",
     "moment": "^2.29.4",
     "mysql": "^2.18.1",
-    "node-fetch": "^2.6.1",
     "path": "^0.12.7",
     "ping": "^0.4.2"
   },

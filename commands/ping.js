@@ -24,9 +24,10 @@ module.exports = {
         .setName('ping')
 		.setDescription('Sprawdź ping bota'),
 	async execute(bot, interaction) {
+        await interaction.deferReply({ ephemeral: true })
         const nowTimestamp = Date.now()
         const pingRequest = await checkConnection(["https://ucp.paradise-rpg.pl/"])
         const pingParadise = pingRequest.timestamp - nowTimestamp
-        return interaction.reply({ embeds: [bot.prettyReply("**Ping bota**\n\n> **Paradise:** " + pingParadise + "ms\n> **Discord:** " + bot.ws.ping + " ms", interaction)], ephemeral: true })
+        return interaction.editReply({ embeds: [bot.prettyReply("**Ping bota**\n\n> **Paradise:** " + pingParadise + "ms\n> **Discord:** " + bot.ws.ping + " ms", interaction)], ephemeral: true })
 	},
 };

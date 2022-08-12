@@ -90,6 +90,7 @@ const CreateDiscordBot = () => {
         return user
     }
     bot.SendActionLog = async (group, author, type, data) => {
+        try {
         const query = await db("SELECT discord_id, settings FROM bots WHERE paradise_id = " + group + " LIMIT 1")
         if (!query || query.length == 0) return;
         const server = await bot.guilds.fetch(query[0].discord_id)
@@ -158,6 +159,7 @@ const CreateDiscordBot = () => {
             }
         }
         channel.send({embeds: [embed]})
+        } catch(e) {}
     }
     bot.logger = logger
     bot.prettyReply = replyEmbed
@@ -187,13 +189,14 @@ const CreateDiscordBot = () => {
 const Load = async (first) => {
     if (first) await CreateDiscordBot()
     logger.info("Ładowanie botów...")
-    const data = await db("SELECT * FROM bots WHERE paid > NOW() AND enabled = 1")
+    const data = await db("SELECT * FROM bots WHERE paid > NOW() AND enabled = 1 AND paradise_id = 1154")
     for (const d of data) {
         if (bots.map(b => b.data.id).includes(d.id)) continue;
         const instance = await new Instance().Create(d, bot)
         bots.push(instance)
     }
-    if (first) {    
+    if (first) {
+        require('./web/server').init(bot)
         const dataHistoryJob = new cron('0,30 * * * *', async () => {
             const data = await db("SELECT users.* FROM users INNER JOIN bots ON users.gid = bots.paradise_id WHERE bots.enabled = 1")
             if (!data || data.length == 0) return;

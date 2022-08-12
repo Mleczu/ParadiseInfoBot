@@ -1,4 +1,5 @@
-const fetch = require('node-fetch')
+const fetch = require('cross-fetch')
+const axios = require('axios').default;
 
 const warehouseNameMappings = {
     "400":"Landstalker",
@@ -222,6 +223,27 @@ const warehouseNameMappings = {
     "2008": "Baron"
 }
 
+const channelMappings = {
+    "channelNews": "news",
+    "channelImport": "import_success",
+    "channelImportFailed": "import_fail",
+    "channelArtifactStart": "artifact_start",
+    "channelArtifactEnd": "artifact_end",
+    "channelExport": "export",
+    "channelPawnshop": "pawnshop",
+    "channelPriceChange": "price_change",
+    "channelHotDeals": "hot_deals",
+    "news": "channelNews",
+    "import_success": "channelImport",
+    "import_fail": "channelImportFailed",
+    "artifact_start": "channelArtifactStart",
+    "artifact_end": "channelArtifactEnd",
+    "export": "channelExport",
+    "pawnshop": "channelPawnshop",
+    "price_change": "channelPriceChange",
+    "hot_deals": "channelHotDeals"
+}
+
 const GetWarehouseNameMapping = (id) => {
     return warehouseNameMappings[`${id}`] || "unknown"
 }
@@ -230,7 +252,53 @@ const GetWarehousePriceMapping = (name) => {
     return warehousePriceMappings[name]
 }
 
+const GetChannelNameMapping = (name) => {
+    return channelMappings[name]
+}
+
 const MakeRequest = async (token, path, authorization, body) => {
+    let data
+    if (authorization) {
+        if (body) {
+            data = await fetch(path, {
+                method: "POST",
+                body: JSON.stringify(body),
+                headers: {
+                    'Authorization': 'Bearer ' + token,
+                    'Content-Type': 'application/json'
+                }
+            }).then(res=>res.json())
+        } else {
+            data = await fetch(path, {
+                method: "GET",
+                headers: {
+                    'Authorization': 'Bearer ' + token,
+                    'Content-Type': 'application/json'
+                }
+            }).then(res=>res.json())
+        }
+    } else {
+        if (body) {
+            data = await fetch(path, {
+                method: "POST",
+                body: JSON.stringify(body),
+                headers: {
+                    'Content-Type': 'application/json'
+                }
+            }).then(res=>res.json())
+        } else {
+            data = await fetch(path, {
+                method: "GET",
+                headers: {
+                    'Content-Type': 'application/json'
+                }
+            }).then(res=>res.json())
+        }
+    }
+    return data;
+}
+
+const MakeRequest2 = async (token, path, authorization, body) => {
     let data
     if (authorization) {
         if (body) {
@@ -296,7 +364,10 @@ const makeRequiredValues = (json) => {
     if (!json.payouts.export) json.payouts.export = {}
     if (!json.payouts.artifact) json.payouts.artifact = {}
     if (!json.payouts.pawnshop) json.payouts.pawnshop = {}
+    if (!json.queue) json.queue = {}
+    if (!json.queue.import) json.queue.import = { status: false, time: 6, channel: "" }
+    if (!json.queue.artifact) json.queue.artifact = { status: false, time: 6, channel: "" }
     return json
 }
 
-module.exports = { MakeRequest, CheckIfUserHasProfile, CreateUserProfile, NumberWithSpaces, GetWarehouseNameMapping, GetWarehousePriceMapping, makeRequiredValues }
+module.exports = { MakeRequest, CheckIfUserHasProfile, CreateUserProfile, NumberWithSpaces, GetWarehouseNameMapping, GetWarehousePriceMapping, makeRequiredValues, GetChannelNameMapping }

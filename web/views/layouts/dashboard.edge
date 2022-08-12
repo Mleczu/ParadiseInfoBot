@@ -1,0 +1,49 @@
+<html>
+    @include('./components/head.edge')
+    <body id="page-top">
+        <div id="wrapper">
+            <nav class="navbar navbar-dark align-items-start sidebar sidebar-dark accordion bg-gradient-primary p-0">
+                <div class="container-fluid d-flex flex-column p-0"><a class="navbar-brand d-flex justify-content-center align-items-center sidebar-brand m-0" href="#">
+                        <div class="sidebar-brand-icon rotate-n-5"><i class="fas fa-robot swing animated"></i></div>
+                        <div class="sidebar-brand-text mx-3"><span>ParadiseInfo</span></div>
+                    </a>
+                    <hr class="sidebar-divider my-0">
+                    <ul class="navbar-nav text-light" id="accordionSidebar">
+                        <li class="nav-item"><a class="nav-link" href="/dashboard/organisation"><i class="fas fa-user"></i><span>Organizacja</span></a></li>
+                        <li class="nav-item"><a class="nav-link" href="/dashboard/members"><i class="far fa-address-book"></i><span>Członkowie</span></a></li>
+                        <li class="nav-item"><a class="nav-link" href="/dashboard/exportPrices"><i class="fas fa-car"></i><span>Ceny exportowe</span></a></li>
+                    </ul>
+                    <div class="text-center d-none d-md-inline"><button class="btn rounded-circle border-0" id="sidebarToggle" type="button"></button></div>
+                </div>
+            </nav>
+            <div class="d-flex flex-column" id="content-wrapper">
+                <div id="content">
+                    <nav class="navbar navbar-light navbar-expand bg-white shadow mb-4 topbar static-top">
+                        <div class="container-fluid"><button class="btn btn-link d-md-none rounded-circle me-3" id="sidebarToggleTop" type="button"><i class="fas fa-bars"></i></button>
+                            <ul class="navbar-nav flex-nowrap ms-auto">
+                                <li class="nav-item dropdown no-arrow">
+                                    <div class="nav-item dropdown no-arrow"><a class="dropdown-toggle nav-link" aria-expanded="false" data-bs-toggle="dropdown" href="#"><span class="d-none d-lg-inline me-2 text-gray-600 small">{{ name }}</span><img class="border rounded-circle img-profile" src="/assets/img/avatar.png"></a>
+                                        <div class="dropdown-menu shadow dropdown-menu-end animated--grow-in">
+                                            <a class="dropdown-item" href="/logout">
+                                                <i class="fas fa-sign-out-alt fa-sm fa-fw me-2 text-gray-400"></i>&nbsp;Wyloguj
+                                            </a>
+                                        </div>
+                                    </div>
+                                </li>
+                            </ul>
+                        </div>
+                    </nav>
+                    @!section('content')
+                </div>
+                <footer class="bg-white sticky-footer">
+                    <div class="container my-auto">
+                        <div class="text-center my-auto copyright"><span>Copyright © ParadiseInfo</span></div>
+                    </div>
+                </footer>
+            </div>
+        </div>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.2.0/js/bootstrap.bundle.min.js" integrity="sha512-9GacT4119eY3AcosfWtHMsT5JyZudrexyEVzTBWV3viP/YfB9e2pEy3N7WXL3SV6ASXpTU0vzzSxsbfsuUH4sQ==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+        <script src="/assets/js/bs-init.js"></script>
+        <script src="/assets/js/theme.js"></script>
+    </body>
+</html>

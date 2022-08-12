@@ -1,0 +1,153 @@
+@layout('layouts/dashboard')
+@section('content')
+<div class="container-fluid">
+    <h3 class="text-dark mb-4">Dostępne zapisy</h3>
+    <div class="row mb-3" id="queueList">
+        <div class="col-lg-6">
+            <div class="card shadow mb-5">
+                <div class="card-header py-3">
+                    <div class="col d-flex">
+                        <div class="col align-middle"><p class="text-primary m-0 fw-bold">Import</p></div>
+                        <div class="col d-flex justify-content-end"><div class="form-check form-switch"><input onchange="ToggleQueue('import', this)" id="queue_import_status" class="form-check-input" type="checkbox" role="switch" /></div></div>
+                    </div>
+                </div>
+                <div class="card-body">
+                    <div id="importQueueAlert"></div>
+                    <div class="row">
+                        <div class="col">
+                            <div class="mb-3">
+                                <label class="form-label" for="queue_import_time"><strong>Możliwość zapisu</strong></label>
+                                <select id="queue_import_time" class="form-control">
+                                    @each((v, k) in hoursSet)
+                                        <option value="{{ k }}">{{ v }}</option>
+                                    @endeach
+                                </select>
+                            </div>
+                        </div>
+                        <div class="col">
+                            <div class="mb-3">
+                                <label class="form-label" for="queue_import_channel"><strong>Kanał z informacjami</strong></label>
+                                <input class="form-control" type="text" id="queue_import_channel" placeholder="Brak">
+                            </div>
+                        </div>
+                    </div>
+                    <div class="mb-3"><button class="btn btn-primary btn-sm" onclick="SaveSettings('import')">Zapisz</button></div>
+                    <div class="row">
+                        <div class="col">
+                            <p class="text-secondary text-center m-0 fw-bold mb-2">Dzisiaj</p>
+                            <table class="table">
+                                <thead>
+                                  <tr>
+                                    <th scope="col">#</th>
+                                    <th scope="col">Nick</th>
+                                    <th scope="col">Akcje</th>
+                                  </tr>
+                                </thead>
+                                <tbody class="align-middle">
+                                    <tr>
+                                        <th scope="row">23:00</th>
+                                        <td>Mleczu</td>
+                                        <td><button class='btn btn-sm btn-danger'>Zwolnij</button></td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                        <div class="col">
+                            <p class="text-secondary text-center m-0 fw-bold mb-2">Jutro</p>
+                            <table class="table">
+                                <thead>
+                                  <tr>
+                                    <th scope="col">#</th>
+                                    <th scope="col">Nick</th>
+                                    <th scope="col">Akcje</th>
+                                  </tr>
+                                </thead>
+                                <tbody class="align-middle">
+                                    <tr>
+                                        <th scope="row">23:00</th>
+                                        <td>Mleczu</td>
+                                        <td><button class='btn btn-sm btn-danger'>Zwolnij</button></td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-lg-6">
+            <div class="card shadow mb-5">
+                <div class="card-header py-3">
+                    <div class="col d-flex">
+                        <div class="col align-middle"><p class="text-primary m-0 fw-bold">Artefakt</p></div>
+                        <div class="col d-flex justify-content-end"><div class="form-check form-switch"><input onchange="ToggleQueue('artifact', this)" id="queue_artifact_status" class="form-check-input" type="checkbox" role="switch" /></div></div>
+                    </div>
+                </div>
+                <div class="card-body">
+                    <div id="artifactQueueAlert"></div>
+                    <div class="row">
+                        <div class="col">
+                            <div class="mb-3">
+                                <label class="form-label" for="queue_artifact_time"><strong>Możliwość zapisu</strong></label>
+                                <select id="queue_artifact_time" class="form-control">
+                                    @each((v, k) in hoursSet)
+                                        <option value="{{ k }}">{{ v }}</option>
+                                    @endeach
+                                </select>
+                            </div>
+                        </div>
+                        <div class="col">
+                            <div class="mb-3">
+                                <label class="form-label" for="queue_artifact_channel"><strong>Kanał z informacjami</strong></label>
+                                <input class="form-control" type="text" id="queue_artifact_channel" placeholder="Brak">
+                            </div>
+                        </div>
+                    </div>
+                    <div class="mb-3"><button class="btn btn-primary btn-sm" onclick="SaveSettings('artifact')">Zapisz</button></div>
+                    <div class="row">
+                        <div class="col">
+                            <p class="text-secondary text-center m-0 fw-bold mb-2">Dzisiaj</p>
+                            <table class="table">
+                                <thead>
+                                  <tr>
+                                    <th scope="col">#</th>
+                                    <th scope="col">Nick</th>
+                                    <th scope="col">Akcje</th>
+                                  </tr>
+                                </thead>
+                                <tbody class="align-middle">
+                                    <tr>
+                                        <th scope="row">23:00</th>
+                                        <td>Mleczu</td>
+                                        <td><button class='btn btn-sm btn-danger'>Zwolnij</button></td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                        <div class="col">
+                            <p class="text-secondary text-center m-0 fw-bold mb-2">Jutro</p>
+                            <table class="table">
+                                <thead>
+                                  <tr>
+                                    <th scope="col">#</th>
+                                    <th scope="col">Nick</th>
+                                    <th scope="col">Akcje</th>
+                                  </tr>
+                                </thead>
+                                <tbody class="align-middle">
+                                    <tr>
+                                        <th scope="row">23:00</th>
+                                        <td>Mleczu</td>
+                                        <td><button class='btn btn-sm btn-danger'>Zwolnij</button></td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<script src="/assets/js/queue.js"></script>
+@endsection

@@ -6,12 +6,15 @@
         "host": "130.61.148.12",
         "user": "paradiseinfo",
         "password": "paramleczudisebrzysiuinfo",
-        "database": "paradise_core"
+        "database": "paradise_dev"
     },
     "discord": {
         "ownerId": "166576531982778369",
-        "clientId": "972557064142487602",
-        "token": "OTcyNTU3MDY0MTQyNDg3NjAy.GI14Rl.tS_xu5MBLev_OQgX2NvxYq6L-Xg5q76BTQrofQ",
+        "clientId": "994648947559776286",
+        "token": "OTk0NjQ4OTQ3NTU5Nzc2Mjg2.GquFDh.EgCHwpYoPVWJpLvzcbLa-Bl6TGyYEMELjvnlAQ",
         "color": "#c077ce"
+    },
+    "web": {
+        "port": 2137
     }
 }

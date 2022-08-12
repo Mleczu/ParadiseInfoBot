@@ -16,7 +16,7 @@ module.exports = {
         const data = await bot.database("SELECT * FROM bots WHERE paid > NOW() AND enabled = 1")
         if (!data || data.length == 0) return interaction.reply({ embeds: [bot.prettyReply("Nie znaleziono organizacji!", interaction)], ephemeral: true })
         let failedMsg = []
-        const embed = bot.prettyReply(interaction.options.getString("wiadomosc"), interaction)
+        const embed = bot.prettyReply(interaction.options.getString("wiadomosc").replace(/\\n/g, "\n"), interaction)
         for (const d of data) {
             const guild = bot.guilds.cache.get(d.discord_id)
             const channel_id = JSON.parse(d.settings).discord.channels.news
@@ -31,6 +31,6 @@ module.exports = {
                 }
             }
         }
-        return interaction.reply({ embeds: [bot.prettyReply("**Wyslano wiadomość o treści:**\n\n" + interaction.options.getString("wiadomosc") + "\n\n**Nie udało się wysłać do organizacji:**\n\n" + failedMsg.join(", "), interaction)] })
+        return interaction.reply({ embeds: [bot.prettyReply("**Wyslano wiadomość o treści:**\n\n" + interaction.options.getString("wiadomosc").replace(/\\n/g, "\n") + "\n\n**Nie udało się wysłać do organizacji:**\n\n" + failedMsg.join(", "), interaction)] })
     },
 };

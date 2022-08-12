@@ -1,0 +1,162 @@
+@layout('layouts/dashboard')
+@section('content')
+<div class="container-fluid">
+    <h3 class="text-dark mb-4">Organizacja</h3>
+    <div class="row mb-3">
+        <div class="col-lg-4">
+            <div class="card mb-3">
+                <div class="card-body text-center shadow"><img class="rounded-circle mb-3 mt-4" src="/assets/img/avatar.png" id="groupLogo" width="160" height="160">
+                    <div class="mb-3 fs-4 fw-bold" id="groupName">Organizacja</div>
+                </div>
+            </div>
+            <div class="card mb-3 shadow">
+                <div class="card-header py-3">
+                    <p class="text-primary m-0 fw-bold">Bilans organizacji</p>
+                </div>
+                <div class="card-body">
+                    <div class="row mb-4">
+                        <div class="col">
+                            <label class="form-label" for="balanceDate"><strong>Data bilansu</strong></label>
+                            <input class="form-control" type="date" id="balanceDate">
+                        </div>
+                    </div>
+                    <div class="row mb-2 mx-1">
+                        <div class="card border-start-success">
+                            <div class="card-body">
+                                <div class="row align-items-center no-gutters">
+                                    <div class="col me-2">
+                                        <div class="text-uppercase text-success fw-bold text-xs mb-1"><span>Zarobione pieniądze</span></div>
+                                        <div class="text-dark fw-bold h5 mb-0"><span id="balanceValuesIn">Brak danych</span></div>
+                                    </div>
+                                    <div class="col-auto"><i class="fas fa-calendar fa-2x text-gray-300"></i></div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row mb-2 mx-1">
+                        <div class="card border-start-danger">
+                            <div class="card-body">
+                                <div class="row align-items-center no-gutters">
+                                    <div class="col me-2">
+                                        <div class="text-uppercase text-danger fw-bold text-xs mb-1"><span>Wypłacone pieniądze</span></div>
+                                        <div class="text-dark fw-bold h5 mb-0"><span id="balanceValuesOut">Brak danych</span></div>
+                                    </div>
+                                    <div class="col-auto"><i class="fas fa-calendar fa-2x text-gray-300"></i></div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row mb-2 mx-1">
+                        <div class="card border-start-primary">
+                            <div class="card-body">
+                                <div class="row align-items-center no-gutters">
+                                    <div class="col me-2">
+                                        <div class="text-uppercase text-primary fw-bold text-xs mb-1"><span>Bilans</span></div>
+                                        <div class="text-dark fw-bold h5 mb-0"><span id="balanceValuesSummary">Brak danych</span></div>
+                                    </div>
+                                    <div class="col-auto"><i class="fas fa-calendar fa-2x text-gray-300"></i></div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-lg-8">
+            <div class="row">
+                <div class="col">
+                    <div class="card shadow mb-3">
+                        <div class="card-header py-3">
+                            <p class="text-primary m-0 fw-bold">Ustawienia organizacji</p>
+                        </div>
+                        <div class="card-body">
+                            <div class="row">
+                                <div class="col">
+                                    <div class="mb-3"><label class="form-label" for="groupId"><strong>ID organizacji</strong></label><input class="form-control" type="text" id="groupId" value="{{ account.paradise_id }}" readonly></div>
+                                </div>
+                                <div class="col">
+                                    <div class="mb-3"><label class="form-label" for="discordId"><strong>ID serwera Discord</strong></label><input class="form-control" type="text" id="discordId" value="{{ account.discord_id }}" readonly></div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="card shadow mb-3">
+                        <div class="card-header py-3">
+                            <p class="text-primary m-0 fw-bold">Ustawienia kanałów</p>
+                        </div>
+                        <div class="card-body">
+                            <form>
+                                <div id="settingsSubmitAlert"></div>
+                                <div class="row">
+                                    <div class="col">
+                                        <div class="mb-3"><label class="form-label" for="channelImport"><strong>Importy</strong></label><input class="form-control" type="text" id="channelImport" placeholder="Brak"></div>
+                                    </div>
+                                    <div class="col">
+                                        <div class="mb-3"><label class="form-label" for="channelImportFailed"><strong>Nieudane importy</strong></label><input class="form-control" type="text" id="channelImportFailed" placeholder="Brak"></div>
+                                    </div>
+                                    <div class="col">
+                                        <div class="mb-3"><label class="form-label" for="channelExport"><strong>Export</strong></label><input class="form-control" type="text" id="channelExport" placeholder="Brak"></div>
+                                    </div>
+                                </div>
+                                <div class="row">
+                                    <div class="col">
+                                        <div class="mb-3"><label class="form-label" for="channelArtifactStart"><strong>Rozpoczęte artefakty</strong></label><input class="form-control" type="text" id="channelArtifactStart" placeholder="Brak"></div>
+                                    </div>
+                                    <div class="col">
+                                        <div class="mb-3"><label class="form-label" for="channelArtifactEnd"><strong>Zakończone artefakty</strong></label><input class="form-control" type="text" id="channelArtifactEnd" placeholder="Brak"></div>
+                                    </div>
+                                    <div class="col">
+                                        <div class="mb-3"><label class="form-label" for="channelPawnshop"><strong>Lombard</strong></label><input class="form-control" type="text" id="channelPawnshop" placeholder="Brak"></div>
+                                    </div>
+                                </div>
+                                <div class="row">
+                                    <div class="col">
+                                        <div class="mb-3"><label class="form-label" for="channelPriceChange"><strong>Zmiana cen</strong></label><input class="form-control" type="text" id="channelPriceChange" placeholder="Brak"></div>
+                                    </div>
+                                    <div class="col">
+                                        <div class="mb-3"><label class="form-label" for="channelHotDeals"><strong>Dobre oferty</strong></label><input class="form-control" type="text" id="channelHotDeals" placeholder="Brak"></div>
+                                    </div>
+                                    <div class="col">
+                                        <div class="mb-3"><label class="form-label" for="channelNews"><strong>Nowości</strong></label><input class="form-control" type="text" id="channelNews" placeholder="Brak"></div>
+                                    </div>
+                                </div>
+                                <div class="mb-3"><button class="btn btn-primary btn-sm" type="submit" id="settingsSubmit">Zapisz</button></div>
+                            </form>
+                        </div>
+                    </div>
+                    <div class="card mb-3 shadow">
+                        <div class="card-header py-3">
+                            <p class="text-primary m-0 fw-bold">Powiadomienia</p>
+                        </div>
+                        <div class="card-body">
+                            <div class="row mb-2">
+                                <div id="pingSubmitAlert"></div>
+                                <div class="col mb-3">
+                                    <div class="form-check form-switch mb-1">
+                                        <input class="form-check-input" type="checkbox" role="switch" id="switchPingGoodDeals">
+                                        <label class="form-check-label" for="switchPingnGoodDeals"><strong>Oznaczenie przy dobrych cenach</strong></label>
+                                    </div>
+                                </div>
+                                <div class="col mb-3">
+                                    <div class="form-check form-switch mb-1">
+                                        <input class="form-check-input" type="checkbox" role="switch" id="switchPing1DayLeft">
+                                        <label class="form-check-label" for="switchPing1DayLeft"><strong>1 dzień do wygaśnięcia</strong></label>
+                                    </div>
+                                </div>
+                                <div class="col mb-3">
+                                    <div class="form-check form-switch mb-1">
+                                        <input class="form-check-input" type="checkbox" role="switch" id="switchPing3DaysLeft">
+                                        <label class="form-check-label" for="switchPing3DaysLeft"><strong>3 dni do wygaśnięcia</strong></label>
+                                    </div>
+                                </div>
+                                <div class="mb-2"><button class="btn btn-primary btn-sm" type="submit" id="pingSubmit">Zapisz</button></div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<script src="/assets/js/organisation.js"></script>
+@endsection

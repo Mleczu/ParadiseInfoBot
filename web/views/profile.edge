@@ -1,0 +1,165 @@
+@layout('layouts/dashboard')
+@section('content')
+<div class="container-fluid">
+    <h3 class="text-dark mb-4">Profil - <span id="ucp_login">?</span></h3>
+    <div class="row mb-3">
+        <div class="col-lg-4">
+            <div class="card-body text-center shadow"><img class="rounded-circle mb-3 mt-4 paradise-skin" src="https://ucp.paradise-rpg.pl/img/0_small.png" id="ucp_skin" width="100" height="100">
+                <div class="mb-3 fs-4 fw-bold" id="ucp_login2">Profil</div>
+            </div>
+        </div>
+        <div class="col-lg-4">
+            <div class="row">
+                <div class="col">
+                    <div class="card shadow mb-3">
+                        <div class="card-header py-3">
+                            <p class="text-primary m-0 fw-bold">Podstawowe informacje</p>
+                        </div>
+                        <div class="card-body">
+                            <div class="row">
+                                <div class="col">
+                                    <div class="mb-3"><label class="form-label" for="profile_id"><strong>ID profilu</strong></label><input class="form-control" type="text" id="real_id" value="{{ profile }}" readonly></div>
+                                </div>
+                                <div class="col">
+                                    <div class="mb-3"><label class="form-label" for="profile_cash"><strong>Pieniądze do wypłaty</strong></label><input class="form-control" type="text" id="profile_cash" placeholder="Ładowanie..." readonly></div>
+                                </div>
+                            </div>
+                            <div class="row">
+                                <div class="col">
+                                    <div class="mb-3"><label class="form-label" for="profile_count_import"><strong>Ilość importów</strong></label><input class="form-control" type="text" id="profile_count_import" placeholder="Ładowanie..." readonly></div>
+                                </div>
+                                <div class="col">
+                                    <div class="mb-3"><label class="form-label" for="profile_waiting"><strong>Oczekujące pojazdy</strong></label><input class="form-control" type="text" id="profile_waiting" placeholder="Ładowanie..." readonly></div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-lg-4">
+            <div class="row">
+                <div class="col">
+                    <div class="card shadow mb-3">
+                        <div class="card-header py-3">
+                            <p class="text-primary m-0 fw-bold">Zarządzanie</p>
+                        </div>
+                        <div class="card-body">
+                            <div id="manageAlert"></div>
+                            <div class="row">
+                                <div class="col">
+                                    <div class="mb-3"><label class="form-label" for="edit_cash"><strong>Pieniądze</strong></label><input class="form-control" type="number" id="edit_cash" value="0" min="0"></div>
+                                </div>
+                            </div>
+                            <div class="row mb-1">
+                                <div class="col">
+                                    <div class="mb-3 d-flex justify-content-start"><button class="btn btn-primary" onclick="UpdateProfile(this, 'increase')">Dodaj</button></div>
+                                </div>
+                                <div class="col">
+                                    <div class="mb-3 d-flex justify-content-center"><button class="btn btn-primary" onclick="UpdateProfile(this, 'set')">Ustaw</button></div>
+                                </div>
+                                <div class="col">
+                                    <div class="mb-3 d-flex justify-content-end"><button class="btn btn-primary" onclick="UpdateProfile(this, 'decrease')">Odejmij</button></div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="row mb-3">
+        <div class="col-lg-12">
+            <div class="row">
+                <div class="col">
+                    <div class="card shadow mb-3">
+                        <div class="card-header py-3">
+                            <p class="text-primary m-0 fw-bold">Wszystkie informacje</p>
+                        </div>
+                        <div class="card-body">
+                            <div class="row">
+                                <div class="col">
+                                    <div class="mb-3"><label class="form-label" for="profile_count_artifact"><strong>Ilość: Artefakty</strong></label><input class="form-control" type="text" id="profile_count_artifact" value="Ładowanie..." readonly></div>
+                                </div>
+                                <div class="col">
+                                    <div class="mb-3"><label class="form-label" for="profile_count_pawnshop"><strong>Ilość: Lombard</strong></label><input class="form-control" type="text" id="profile_count_pawnshop" placeholder="Ładowanie..." readonly></div>
+                                </div>
+                                <div class="col">
+                                    <div class="mb-3"><label class="form-label" for="profile_count_import"><strong>Ilość: Importy</strong></label><input class="form-control" type="text" id="profile_count_import" placeholder="Ładowanie..." readonly></div>
+                                </div>
+                                <div class="col">
+                                    <div class="mb-3"><label class="form-label" for="profile_count_export"><strong>Ilość: Exporty</strong></label><input class="form-control" type="text" id="profile_count_export" placeholder="Ładowanie..." readonly></div>
+                                </div>
+                            </div>
+                            <div class="row">
+                                <div class="col">
+                                    <div class="mb-3"><label class="form-label" for="profile_earn_artifact"><strong>Zarobek: Artefakty</strong></label><input class="form-control" type="text" id="profile_earn_artifact" value="Ładowanie..." readonly></div>
+                                </div>
+                                <div class="col">
+                                    <div class="mb-3"><label class="form-label" for="profile_earn_pawnshop"><strong>Zarobek: Lombard</strong></label><input class="form-control" type="text" id="profile_earn_pawnshop" placeholder="Ładowanie..." readonly></div>
+                                </div>
+                                <div class="col">
+                                    <div class="mb-3"><label class="form-label" for="profile_earn_import"><strong>Zarobek: Importy</strong></label><input class="form-control" type="text" id="profile_earn_import" placeholder="Ładowanie..." readonly></div>
+                                </div>
+                                <div class="col">
+                                    <div class="mb-3"><label class="form-label" for="profile_earn_export"><strong>Zarobek: Exporty</strong></label><input class="form-control" type="text" id="profile_earn_export" placeholder="Ładowanie..." readonly></div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="row">
+                <div class="col">
+                    <div class="card shadow mb-3">
+                        <div class="card-header py-3">
+                            <p class="text-primary m-0 fw-bold">Wykres - Pieniądze do wypłaty</p>
+                        </div>
+                        <div class="card-body">
+                            <div class="row">
+                                <div class="col">
+                                    <canvas id="payoutChart">
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="row">
+                <div class="col">
+                    <div class="card shadow mb-3">
+                        <div class="card-header py-3">
+                            <p class="text-primary m-0 fw-bold">Niebezpieczne</p>
+                        </div>
+                        <div class="card-body">
+                            <div class="row mb-1 mx-1">
+                                <button class="btn btn-danger" data-bs-toggle="modal" data-bs-target="#deleteAccountModal">Usuń profil</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<div class="modal fade" id="deleteAccountModal" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1" aria-labelledby="deleteAccountModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="deleteAccountModalLabel">Potwierdź usunięcie profilu</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Zamknij"></button>
+            </div>
+            <div class="modal-body">
+                <div id="deleteAccountAlert"></div>
+                Usunięcie profilu spowoduje usunięcie wszystkich danych o koncie!
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Zamknij</button>
+                <button type="button" class="btn btn-danger" onclick="DeleteProfile()">Usuń profil</button>
+            </div>
+        </div>
+    </div>
+</div>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/3.9.1/chart.min.js" integrity="sha512-ElRFoEQdI5Ht6kZvyzXhYG9NqjtkmlkfYk0wr6wHxU9JEHakS7UJZNeml5ALk+8IKlU6jDgMabC3vkumRokgJA==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+<script src="/assets/js/profile.js"></script>
+@endsection

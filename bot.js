@@ -2,7 +2,6 @@ const logger = require('./logger')
 const { MakeRequest, NumberWithSpaces, CheckIfUserHasProfile, CreateUserProfile, GetWarehouseNameMapping, makeRequiredValues } = require('./functions')
 const cron = require('cron').CronJob;
 const moment = require('moment');
-const fetch = require('node-fetch')
 
 let logTypes = {
     pawnshop: new RegExp(/W lombardzie \'(.*?)\' umieszczono (\d*) przedmiotów o wartości \$(\d*)/),
@@ -60,7 +59,7 @@ class Instance {
         this.createCronJob('0 0 * * * *', this.UpdateSettings);
         this.createCronJob('30 0 * * * *', this.Ping1DayLeft);
         this.createCronJob('30 0 * * * *', this.Ping3DaysLeft);
-        // this.createCronJob('1 * * * * *', this.ProcessQueue);
+        this.createCronJob('1 * * * * *', this.ProcessQueue);
         // this.createCronJob('0 1 * * * *', this.Ping1DayWarehouse);
         return this
     }
@@ -119,24 +118,8 @@ class Instance {
             dateFrom: new Date(Date.now() - (24 * 60 * 60 * 1000)).toISOString(),
             dateTo: new Date().toISOString()
         }
-        // let result = await MakeRequest(this.token, this.groupUrl + "/logs", true, body)
-        let result = await fetch(this.groupUrl + "/logs", {
-            method: "POST",
-            body: JSON.stringify(body),
-            headers: {
-                'Authorization': 'Bearer ' + this.token,
-                'Content-Type': 'application/json'
-            }
-        })
-        try {
-            const json = await result.json()
-            return json;
-        } catch (e) {
-            console.log(e)
-            const t = await result.text()
-            console.log(t)
-            return []
-        }
+        let result = await MakeRequest(this.token, this.groupUrl + "/logs", true, body)
+        return result
     }
 
     async ProcessLogs() {
@@ -223,9 +206,9 @@ class Instance {
     async AddCash(user, count, type) {
         const profileCheck = await CheckIfUserHasProfile(this.bot, this.group, user)
         if (!profileCheck) await CreateUserProfile(this.bot, this.group, user)
-        this.AddBalanceHistory(count, false)
         const modifier = await this.GetPaymentModifier(user, type)
         count = ((modifier.percent) ? Math.floor((count * (modifier.count / 100))) : modifier.count)
+        this.AddBalanceHistory(count, false)
         await this.bot.database("UPDATE `users` SET cash = cash + " + count + ", earn_" + type + " = earn_" + type + " + " + count + " WHERE uid = " + user.id + " AND gid = " + this.group + " LIMIT 1")
     }
     
@@ -417,23 +400,29 @@ class Instance {
     }
 
     async ProcessQueue() {
-        // const queueTypes = ["import", "artifact"]
-        const queueTypes = ["import"]
+        const queueTypes = ["import", "artifact"]
         for (const type of queueTypes) {
             if (!this.settings.queue[type].status) continue
             const now = moment()
             const t = this.settings.queue[type].time
             for (let i = 1; i <= t; i++) {
-                let add = now.hour() + i + 2
+                let add = now.hour() + i
                 const end = moment().hours(add).minutes(0).seconds(0).milliseconds(0)
-                console.log(end.toISOString())
+                const qd = await this.GetQueueData(type, end.format('YYYY-MM-DD HH:mm'))
+                if (!qd) await this.CreateQueueData(type, end.format('YYYY-MM-DD HH:mm'))
             }
         }
     }
 
-    // async CheckIfQueueIsOpen(type, date) {
-    //     const 
-    // }
+    async CreateQueueData(type, date) {
+        await this.bot.database("INSERT INTO queue (`gid`, `type`, `date`) VALUES (" + this.group + ", '" + type + "', '" + date + "')")
+    }
+
+    async GetQueueData(type, date) {
+        const data = await this.bot.database("SELECT * FROM queue WHERE `gid` = " + this.group + " AND `type` = '" + type + "' AND `date` = '" + date + "'")
+        if (!data || data.length == 0) return
+        return data[0]
+    }
 }
 
 module.exports = Instance
