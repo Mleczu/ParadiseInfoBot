@@ -1,6 +1,7 @@
 const logger = require('./logger')
 const { MakeRequest, NumberWithSpaces, CheckIfUserHasProfile, CreateUserProfile, GetWarehouseNameMapping, makeRequiredValues } = require('./functions')
 const cron = require('cron').CronJob;
+const moment = require('moment');
 
 let logTypes = {
     pawnshop: new RegExp(/W lombardzie \'(.*?)\' umieszczono (\d*) przedmiotów o wartości \$(\d*)/),
@@ -58,6 +59,7 @@ class Instance {
         this.createCronJob('0 0 * * * *', this.UpdateSettings);
         this.createCronJob('30 0 * * * *', this.Ping1DayLeft);
         this.createCronJob('30 0 * * * *', this.Ping3DaysLeft);
+        // this.createCronJob('1 * * * * *', this.ProcessQueue);
         // this.createCronJob('0 1 * * * *', this.Ping1DayWarehouse);
         return this
     }
@@ -116,8 +118,24 @@ class Instance {
             dateFrom: new Date(Date.now() - (24 * 60 * 60 * 1000)).toISOString(),
             dateTo: new Date().toISOString()
         }
-        let result = await MakeRequest(this.token, this.groupUrl + "/logs", true, body)
-        return result;
+        // let result = await MakeRequest(this.token, this.groupUrl + "/logs", true, body)
+        let result = await fetch(this.groupUrl + "/logs", {
+            method: "POST",
+            body: JSON.stringify(body),
+            headers: {
+                'Authorization': 'Bearer ' + this.token,
+                'Content-Type': 'application/json'
+            }
+        })
+        try {
+            const json = await result.json()
+            return json;
+        } catch (e) {
+            console.log(e)
+            const t = await result.text()
+            console.log(t)
+            return []
+        }
     }
 
     async ProcessLogs() {
@@ -396,6 +414,25 @@ class Instance {
         if (nowDay.getHours() != this.paid.getHours())
         this.bot.SendActionLog(this.group, "Opłata", "news", { message: "**Bot wygasa za** `3 dni` " })
     }
+
+    async ProcessQueue() {
+        // const queueTypes = ["import", "artifact"]
+        const queueTypes = ["import"]
+        for (const type of queueTypes) {
+            if (!this.settings.queue[type].status) continue
+            const now = moment()
+            const t = this.settings.queue[type].time
+            for (let i = 1; i <= t; i++) {
+                let add = now.hour() + i + 2
+                const end = moment().hours(add).minutes(0).seconds(0).milliseconds(0)
+                console.log(end.toISOString())
+            }
+        }
+    }
+
+    // async CheckIfQueueIsOpen(type, date) {
+    //     const 
+    // }
 }
 
 module.exports = Instance
