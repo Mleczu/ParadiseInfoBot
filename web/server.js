@@ -352,6 +352,7 @@ app.post('/auth', async (req, res) => {
         return res.redirect('/login')            
     }
     const d = data[0]
+    console.log(d)
     req.session.isLoggedIn = true;
     req.session.username = JSON.parse(d.settings).client.username;
     req.session.account = d
@@ -584,8 +585,14 @@ app.get('/api/queue/data', async (req, res) => {
     if (!req.session.isLoggedIn) return res.status(403).json({ message: "Brak uprawnień" })
     const data = await db("SELECT settings FROM bots WHERE paradise_id = " + req.session.account.paradise_id + " ORDER BY id DESC LIMIT 1")
     if (!data || data.length == 0) return res.json({})
-    const q = makeRequiredValues(JSON.parse(data[0].settings)).queue
-    return res.json(q)
+    const data2 = await db("SELECT * FROM queue WHERE gid = " + req.session.account.paradise_id + " AND date > (NOW() - INTERVAL 1 DAY) ORDER BY date ASC")
+    if (!data2 || data2.length == 0) return res.json({})
+    let result = makeRequiredValues(JSON.parse(data[0].settings)).queue
+    for (const d of data2) {
+        if (!result[d.type].table) result[d.type].table = []
+        result[d.type].table.push(d)
+    }
+    return res.json(result)
 })
 
 app.post('/api/queue/status', async (req, res) => {
@@ -597,6 +604,34 @@ app.post('/api/queue/status', async (req, res) => {
     jsonData.queue[req.body.data.where].status = req.body.data.status
     await db("UPDATE bots SET settings = '" + JSON.stringify(jsonData) + "' WHERE paradise_id = " + req.session.account.paradise_id + " ORDER BY id DESC LIMIT 1")
     return res.json({ message: "Updated", success: true })
+})
+
+app.post('/api/queue/edit', async (req, res) => {
+    if (!req.session.isLoggedIn) return res.status(403).json({ message: "Brak uprawnień" })
+    if (!req.body.data.where) return res.status(400).json({ message: "Bad request" })
+    const data = await db("SELECT settings FROM bots WHERE paradise_id = " + req.session.account.paradise_id)
+    if (!data || data.length == 0) return res.json({ message: "Server error" })
+    let jsonData = makeRequiredValues(JSON.parse(data[0].settings))
+    jsonData.queue[req.body.data.where].channel = req.body.data.channel
+    jsonData.queue[req.body.data.where].time = req.body.data.time
+    await db("UPDATE bots SET settings = '" + JSON.stringify(jsonData) + "' WHERE paradise_id = " + req.session.account.paradise_id + " ORDER BY id DESC LIMIT 1")
+    return res.json({ message: "Updated", success: true })
+})
+
+app.post('/api/queue/delete', async (req, res) => {
+    if (!req.session.isLoggedIn) return res.status(403).json({ message: "Brak uprawnień" })
+    if (!req.body.data.where || !req.body.data.date) return res.status(400).json({ message: "Bad request" })
+    console.log(req.body.data.where)
+    console.log(req.body.data.date)
+    await db("UPDATE queue SET user = NULL WHERE `gid` = " + req.session.account.paradise_id + " AND `type` = '" + req.body.data.where + "' AND `date` = '" + req.body.data.date + "' LIMIT 1")
+    return res.json({ message: "Updated", success: true })
+})
+
+app.get('/api/paradise/:id', async (req, res) => {
+    if (!req.session.isLoggedIn) return res.status(403).json({ message: "Brak uprawnień" })
+    if (!req.params.id || isNaN(req.params.id)) return res.status(400).json({ message: "Bad request" })
+    const data = await bot.paradise.GetUserById(req.params.id)
+    return res.json({ id: req.params.id, account: data || {login: "Brak danych"} })
 })
 
 app.get('*', (req, res) => {
