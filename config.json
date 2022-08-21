@@ -10,7 +10,7 @@
     },
     "discord": {
         "ownerId": "166576531982778369",
-        "clientId": "994648947559776286",
+        "clientId": "972557064142487602",
         "token": "OTcyNTU3MDY0MTQyNDg3NjAy.GBHJFy.Ug6A3D--ZXod6BeOEqE45sqgzMKUmLhoTtPhj8",
         "color": "#c077ce",
         "invite": "https://discord.com/api/oauth2/authorize?client_id=972557064142487602&permissions=8&scope=bot%20applications.commands"
