@@ -60,7 +60,7 @@ class Instance {
         this.createCronJob('0 0 * * * *', this.UpdateSettings);
         this.createCronJob('30 0 * * * *', this.Ping1DayLeft);
         this.createCronJob('30 0 * * * *', this.Ping3DaysLeft);
-        // this.createCronJob('1 * * * * *', this.ProcessQueue);
+        this.createCronJob('1 * * * * *', this.ProcessQueue);
         // this.createCronJob('0 1 * * * *', this.Ping1DayWarehouse);
         return this
     }
