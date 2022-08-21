@@ -244,6 +244,11 @@ const channelMappings = {
     "hot_deals": "channelHotDeals"
 }
 
+const queueNames = {
+    "import": "Import",
+    "artifact": "Artefakt"
+}
+
 const GetWarehouseNameMapping = (id) => {
     return warehouseNameMappings[`${id}`] || "unknown"
 }
@@ -254,6 +259,14 @@ const GetWarehousePriceMapping = (name) => {
 
 const GetChannelNameMapping = (name) => {
     return channelMappings[name]
+}
+
+const GetQueueNameMapping = (name) => {
+    return queueNames[name] || name
+}
+
+const GetReverseQueueNameMapping = (name) => {
+    return Object.keys(queueNames).find(key => queueNames[key] === name) || name
 }
 
 const MakeRequest = async (token, path, authorization, body) => {
@@ -370,4 +383,4 @@ const makeRequiredValues = (json) => {
     return json
 }
 
-module.exports = { MakeRequest, CheckIfUserHasProfile, CreateUserProfile, NumberWithSpaces, GetWarehouseNameMapping, GetWarehousePriceMapping, makeRequiredValues, GetChannelNameMapping }
+module.exports = { MakeRequest, CheckIfUserHasProfile, CreateUserProfile, NumberWithSpaces, GetWarehouseNameMapping, GetWarehousePriceMapping, makeRequiredValues, GetChannelNameMapping, GetQueueNameMapping, GetReverseQueueNameMapping }

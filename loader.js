@@ -161,6 +161,21 @@ const CreateDiscordBot = () => {
         channel.send({embeds: [embed]})
         } catch(e) {}
     }
+    bot.SendQueueLog = async (group, queue, message) => {
+        if (!queue) return
+        try {
+        const query = await db("SELECT discord_id, settings FROM bots WHERE paradise_id = " + group + " LIMIT 1")
+        if (!query || query.length == 0) return;
+        const server = await bot.guilds.fetch(query[0].discord_id)
+        if (!server) return
+        const channelId = JSON.parse(query[0].settings).queue[queue].channel
+        if (!channelId || channelId.length == 0) return
+        const channel = await server.channels.fetch(channelId)
+        if (!channel) return
+        const embed = new Discord.EmbedBuilder().setColor(config.discord.color).setTimestamp().setDescription(message)
+        channel.send({embeds: [embed]})
+        } catch(e) {}
+    }
     bot.logger = logger
     bot.prettyReply = replyEmbed
     bot.commands = new Discord.Collection();

@@ -5,7 +5,12 @@ const LoadData = async () => {
         const d = data[k]
         document.getElementById('queue_' + k + '_time').value = d.time
         document.getElementById('queue_' + k + '_status').checked = d.status
-        console.log(d)
+        let tableData = ''
+        for (const td of d.table) {
+            const user = ((td.user) ? await GetMemberByUid(td.user) : {login: "---"})
+            tableData += "<tr><th>" + moment(td.date).format('DD-MM-YYYY') + "</th><th>" + moment(td.date).format('HH:mm') + "</th><td>" + user.login + "</td><td><button class='btn btn-sm btn-" + ((td.user) ? "danger" : "secondary") + "'" + ((td.user) ? "" : " disabled") + " onclick='DeleteAssignment(`" + k + "`, `" + moment(td.date).format('YYYY-MM-DD HH:mm') + "`)'>Zwolnij</button></td></tr>"
+        }
+        document.getElementById('queue_' + k + "_table").innerHTML = tableData
     }
 }
 LoadData()
@@ -32,9 +37,7 @@ const ToggleQueue = async (where, check) => {
 }
 
 const SaveSettings = async (where) => {
-    let c = null
-    const ic = document.getElementById("queue_" + where + "_channel").value
-    if ((ic.value != null && ic.value.length > 10 && !isNaN(ic.value)) || (ic.value == "")) c = ic
+    let c = document.getElementById("queue_" + where + "_channel").value
     const data = await fetch("/api/queue/edit", {
         method: "POST",
         headers: {
@@ -53,4 +56,15 @@ const SaveSettings = async (where) => {
         showAlert(where + "QueueAlert", "danger", "<strong>Nie udało się zapisać ustawień!</strong> Wystąpił błąd - " + data.message)
         return
     }
+}
+
+const DeleteAssignment = async (where, date) => {
+    await fetch("/api/queue/delete", {
+        method: "POST",
+        headers: {
+            'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ data: { where, date } })
+    })
+    window.location.reload()
 }

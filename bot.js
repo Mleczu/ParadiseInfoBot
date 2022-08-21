@@ -1,5 +1,5 @@
 const logger = require('./logger')
-const { MakeRequest, NumberWithSpaces, CheckIfUserHasProfile, CreateUserProfile, GetWarehouseNameMapping, makeRequiredValues } = require('./functions')
+const { MakeRequest, NumberWithSpaces, CheckIfUserHasProfile, CreateUserProfile, GetWarehouseNameMapping, makeRequiredValues, GetQueueNameMapping } = require('./functions')
 const cron = require('cron').CronJob;
 const moment = require('moment');
 
@@ -51,6 +51,7 @@ class Instance {
         this.isEnabled = true
         this.paid = this.data.paid
         await this.Login()
+        this.ProcessQueue()
         this.createInterval(this.Login, 1 * 60 * 60 * 1000)
         this.createInterval(this.PublishInformation, 30 * 1000)
         this.createCronJob('0 * * * * *', this.ProcessLogs)
@@ -59,7 +60,7 @@ class Instance {
         this.createCronJob('0 0 * * * *', this.UpdateSettings);
         this.createCronJob('30 0 * * * *', this.Ping1DayLeft);
         this.createCronJob('30 0 * * * *', this.Ping3DaysLeft);
-        this.createCronJob('1 * * * * *', this.ProcessQueue);
+        // this.createCronJob('1 * * * * *', this.ProcessQueue);
         // this.createCronJob('0 1 * * * *', this.Ping1DayWarehouse);
         return this
     }
@@ -408,14 +409,24 @@ class Instance {
             for (let i = 1; i <= t; i++) {
                 let add = now.hour() + i
                 const end = moment().hours(add).minutes(0).seconds(0).milliseconds(0)
-                const qd = await this.GetQueueData(type, end.format('YYYY-MM-DD HH:mm'))
-                if (!qd) await this.CreateQueueData(type, end.format('YYYY-MM-DD HH:mm'))
+                if ((end.weekday() == 6 || end.weekday() == 0) && (end.hour() >= 19 && end.hour() <= 22)) {
+                    const bonusMinutes = [0, 15, 30, 45]
+                    for (const bm of bonusMinutes) {
+                        const bonusEnd = moment().hours(add).minutes(bm).seconds(0).milliseconds(0)
+                        const bonus = await this.GetQueueData(type, bonusEnd.format('YYYY-MM-DD HH:mm'))
+                        if (!bonus) await this.CreateQueueData(type, bonusEnd.format('YYYY-MM-DD HH:mm'))
+                    }
+                } else {
+                    const qd = await this.GetQueueData(type, end.format('YYYY-MM-DD HH:mm'))
+                    if (!qd) await this.CreateQueueData(type, end.format('YYYY-MM-DD HH:mm'))
+                }
             }
         }
     }
 
     async CreateQueueData(type, date) {
         await this.bot.database("INSERT INTO queue (`gid`, `type`, `date`) VALUES (" + this.group + ", '" + type + "', '" + date + "')")
+        await this.bot.SendQueueLog(this.group, type, "Dostępne nowe zapisy: **" + date + "**")
     }
 
     async GetQueueData(type, date) {

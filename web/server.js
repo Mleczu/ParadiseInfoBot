@@ -8,6 +8,7 @@ const logger = require('../logger')
 const db = Database.connect(config.database)
 const { escape } = require('mysql')
 const sha256 = require("crypto-js/sha256");
+const moment = require('moment')
 
 const { GetChannelNameMapping } = require('../functions')
 
@@ -352,11 +353,9 @@ app.post('/auth', async (req, res) => {
         return res.redirect('/login')            
     }
     const d = data[0]
-    console.log(d)
     req.session.isLoggedIn = true;
     req.session.username = JSON.parse(d.settings).client.username;
     req.session.account = d
-    console.log(req.session)
     logger.info("Pomyślne logowanie do panelu przez " + (req.headers['x-forwarded-for'] || req.socket.remoteAddress) + " pod nickiem " + req.body.username)
     return res.redirect("/dashboard")
 })
@@ -397,6 +396,22 @@ app.get('/dashboard/profile/:id?', async (req, res) => {
     const checkIfOrganisation = await db("SELECT id FROM users WHERE gid = " + req.session.account.paradise_id + " AND uid = " + req.params.id)
     if (!checkIfOrganisation || checkIfOrganisation.length == 0) return res.redirect("/dashboard/members")
     return res.render("profile", { name: req.session.username, account: req.session.account, profile: req.params.id })
+})
+
+app.get('/queue/:id/:type', async (req, res) => {
+    const types = ["artifact", "import"]
+    if (!types.includes(req.params.type) || !req.params.id || isNaN(req.params.id)) return res.redirect("/")
+    const data = await db("SELECT * FROM queue WHERE gid = " + req.params.id + " AND date > (NOW() - INTERVAL 1 DAY) AND type = '" + req.params.type + "' ORDER BY date ASC")
+    if (!data) return res.redirect("/")
+    let resdata = ""
+    for (const d of data) {
+        let u = { login: "---" }
+        if (d.user) {
+            u = await bot.paradise.GetUserById(d.user)
+        }
+        resdata += "<tr><th>" + moment(d.date).format('DD-MM-YYYY') + "</th><th>" + moment(d.date).format('HH:mm') + "</th><td>" + u.login + "</td></tr>"
+    }
+    return res.render("queue", { data: resdata })
 })
 
 app.get('/api/gethash/:pass', async (req, res) => {

@@ -11,8 +11,8 @@ module.exports = {
             bot.logger.info("Wykonanie komendy " + interaction.commandName + " przez " + interaction.user.tag)
             await command.execute(bot, interaction);
         } catch (error) {
-            bot.logger.info("Bład przy wykonywaniu interakcji - " + command)
-            // bot.logger.error(error);
+            bot.logger.info("Bład przy wykonywaniu interakcji - " + interaction.commandName)
+            console.log(error);
             await interaction.reply({ embeds: [bot.prettyReply('Wystąpił bład podczas wykonywania komendy!', interaction)], ephemeral: true });
         }
     },

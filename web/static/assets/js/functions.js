@@ -1,18 +1,7 @@
-const membersCache = []
-
 const GetMemberByUid = async (id) => {
-    if (membersCache.filter(m => m.ttl > Date.now()).map(m => m.id).includes(id)) return membersCache.filter(m => m.ttl > Date.now() && m.id == id)[0]
-    const data = await fetch("https://ucp.paradise-rpg.pl/api/profile/" + id).then(res => res.json())
+    const data = await fetch("/api/paradise/" + id).then(res => res.json())
     if (!data || data.length == 0) return { login: "Brak danych" };
-    let user = {
-        id: data.account.id,
-        login: data.account.login,
-        rank: data.account.rank,
-        skin: data.account.skin,
-        ttl: Date.now() + (5 * 60 * 1000)
-    }
-    membersCache.push(user)
-    return user
+    return data.account
 }
 
 const NumberWithSpaces = (x) => {

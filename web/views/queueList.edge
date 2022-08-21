@@ -34,41 +34,17 @@
                     <div class="mb-3"><button class="btn btn-primary btn-sm" onclick="SaveSettings('import')">Zapisz</button></div>
                     <div class="row">
                         <div class="col">
-                            <p class="text-secondary text-center m-0 fw-bold mb-2">Dzisiaj</p>
+                            <p class="text-secondary text-center m-0 fw-bold mb-2">Lista zapisów</p>
                             <table class="table">
                                 <thead>
                                   <tr>
-                                    <th scope="col">#</th>
+                                    <th scope="col">Data</th>
+                                    <th scope="col">Godzina</th>
                                     <th scope="col">Nick</th>
                                     <th scope="col">Akcje</th>
                                   </tr>
                                 </thead>
-                                <tbody class="align-middle">
-                                    <tr>
-                                        <th scope="row">23:00</th>
-                                        <td>Mleczu</td>
-                                        <td><button class='btn btn-sm btn-danger'>Zwolnij</button></td>
-                                    </tr>
-                                </tbody>
-                            </table>
-                        </div>
-                        <div class="col">
-                            <p class="text-secondary text-center m-0 fw-bold mb-2">Jutro</p>
-                            <table class="table">
-                                <thead>
-                                  <tr>
-                                    <th scope="col">#</th>
-                                    <th scope="col">Nick</th>
-                                    <th scope="col">Akcje</th>
-                                  </tr>
-                                </thead>
-                                <tbody class="align-middle">
-                                    <tr>
-                                        <th scope="row">23:00</th>
-                                        <td>Mleczu</td>
-                                        <td><button class='btn btn-sm btn-danger'>Zwolnij</button></td>
-                                    </tr>
-                                </tbody>
+                                <tbody class="align-middle" id="queue_import_table"></tbody>
                             </table>
                         </div>
                     </div>
@@ -106,41 +82,17 @@
                     <div class="mb-3"><button class="btn btn-primary btn-sm" onclick="SaveSettings('artifact')">Zapisz</button></div>
                     <div class="row">
                         <div class="col">
-                            <p class="text-secondary text-center m-0 fw-bold mb-2">Dzisiaj</p>
+                            <p class="text-secondary text-center m-0 fw-bold mb-2">Lista zapisów</p>
                             <table class="table">
                                 <thead>
                                   <tr>
-                                    <th scope="col">#</th>
+                                    <th scope="col">Data</th>
+                                    <th scope="col">Godzina</th>
                                     <th scope="col">Nick</th>
                                     <th scope="col">Akcje</th>
                                   </tr>
                                 </thead>
-                                <tbody class="align-middle">
-                                    <tr>
-                                        <th scope="row">23:00</th>
-                                        <td>Mleczu</td>
-                                        <td><button class='btn btn-sm btn-danger'>Zwolnij</button></td>
-                                    </tr>
-                                </tbody>
-                            </table>
-                        </div>
-                        <div class="col">
-                            <p class="text-secondary text-center m-0 fw-bold mb-2">Jutro</p>
-                            <table class="table">
-                                <thead>
-                                  <tr>
-                                    <th scope="col">#</th>
-                                    <th scope="col">Nick</th>
-                                    <th scope="col">Akcje</th>
-                                  </tr>
-                                </thead>
-                                <tbody class="align-middle">
-                                    <tr>
-                                        <th scope="row">23:00</th>
-                                        <td>Mleczu</td>
-                                        <td><button class='btn btn-sm btn-danger'>Zwolnij</button></td>
-                                    </tr>
-                                </tbody>
+                                <tbody class="align-middle" id="queue_artifact_table"></tbody>
                             </table>
                         </div>
                     </div>
@@ -149,5 +101,6 @@
         </div>
     </div>
 </div>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.29.4/moment.min.js"></script>
 <script src="/assets/js/queue.js"></script>
 @endsection
