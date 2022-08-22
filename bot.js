@@ -179,9 +179,7 @@ class Instance {
     async GetPaymentModifier(user, type) {
         let rank = await this.GetRank(user.id)
         rank = rank.toLowerCase().replace(/#[A-Za-z0-9]{6}/g, "")
-        if (this.group == 1359) console.log(user + " -> " + rank)
         let tempSettings = await this.bot.database("SELECT settings FROM bots WHERE paradise_id = " + this.group + " LIMIT 1")
-        if (this.group == 1359) console.log(tempSettings)
         if (!tempSettings || tempSettings.length == 0) return { count: 50, percent: true }
         tempSettings = JSON.parse(tempSettings[0].settings)
         if (tempSettings.perUserRankSystem) {
@@ -190,7 +188,6 @@ class Instance {
             rank = rank.trim()
         }
         const table = tempSettings.payouts[type]
-        if (this.group == 1359) console.log(table)
         if (table[rank]) return table[rank]
         if (table["*"]) return table["*"]
         if (type == "export") return { count: 0, percent: true }
@@ -208,12 +205,10 @@ class Instance {
     }
     
     async AddCash(user, count, type) {
-        if (this.group == 1359) console.log(user + " -> " + count + " -> " + type)
         const profileCheck = await CheckIfUserHasProfile(this.bot, this.group, user)
         if (!profileCheck) await CreateUserProfile(this.bot, this.group, user)
         const modifier = await this.GetPaymentModifier(user, type)
         count = ((modifier.percent) ? Math.floor((count * (modifier.count / 100))) : modifier.count)
-        if (this.group == 1359) console.log(user + " -> 2 STEP: " + modifier + " -> " + count)
         this.AddBalanceHistory(count, false)
         await this.bot.database("UPDATE `users` SET cash = cash + " + count + ", earn_" + type + " = earn_" + type + " + " + count + " WHERE uid = " + user.id + " AND gid = " + this.group + " LIMIT 1")
     }
