@@ -22,6 +22,6 @@ module.exports = {
             payoutData.push("**" + user.login + "** - " + NumberWithSpaces(d.cash))
             totalCash = totalCash + d.cash
         }
-        return interaction.editReply({ embeds: [bot.prettyReply("**Lista wypłat**\n\n" + payoutData.join("\n"), interaction).setFooter({ text: "Łącznie do wypłaty: " + NumberWithSpaces(totalCash) })] })
+        return interaction.editReply({ embeds: [bot.prettyReply("**Lista wypłat**\n\n" + payoutData.join("\n"), interaction).setFooter({ text: "Łącznie do wypłaty: " + NumberWithSpaces(totalCash) + "$" })] })
     },
 };
