@@ -52,9 +52,9 @@ class Instance {
         this.paid = this.data.paid
         await this.Login()
         this.ProcessQueue()
-        this.createInterval(this.Login, 1 * 60 * 60 * 1000)
+        this.createInterval(this.Login, 2 * 60 * 60 * 1000)
         this.createInterval(this.PublishInformation, 30 * 1000)
-        this.createCronJob('0 * * * * *', this.ProcessLogs)
+        this.createCronJob('0 */2 * * * *', this.ProcessLogs)
         this.createCronJob('0 1 * * * *', this.CheckHotDeals);
         this.createCronJob('0 1 * * * *', this.LogWarehousePrices);
         this.createCronJob('0 0 * * * *', this.UpdateSettings);
