@@ -7,7 +7,7 @@ let logTypes = {
     pawnshop: new RegExp(/W lombardzie \'(.*?)\' umieszczono (\d*) przedmiotów o wartości \$(\d*)/),
     import_success: new RegExp(/Import pojazdu (.*?) o kwocie \$(\d*) do magazynu/),
     import_fail: new RegExp(/Import pojazdu o kwocie \$(\d*) zakończony porażką./),
-    import_fail_second: new RegExp(/Import zakończony porażką./),
+    import_fail_second: new RegExp(/Import pojazdu zakończony porażką./),
     artifact_start: new RegExp(/Rozpoczęcie akcji artefakt/),
     artifact_end: new RegExp(/Znalezienie artefaktu wartego \$(\d*) i (\d*) EXP/),
     export: new RegExp(/Eksport pojazdu (.*?) za \$(\d*) oraz (\d*) EXP/),
@@ -437,3 +437,8 @@ class Instance {
 }
 
 module.exports = Instance
+
+process.on('uncaughtException', function (err) {
+    console.error(err);
+    console.log("Nieoczekiwany błąd");
+});
