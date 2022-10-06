@@ -13,7 +13,7 @@ module.exports = {
         const gid = await bot.GetGroup(interaction.guild.id)
         if (!gid) return interaction.editReply({ embeds: [bot.prettyReply("**Hola hola, nie wykryto organizacji dla tego serwera.**", interaction)] })
         if (!gid.paid) return interaction.editReply({ embeds: [bot.prettyReply("**Hola hola, bot dla tej organizacji nie jest opłacony.**", interaction)] })
-        const data = await bot.database("SELECT uid, cash FROM users WHERE gid = " + gid.id + " AND cash > 2500 ORDER BY cash DESC LIMIT 25")
+        const data = await bot.database("SELECT uid, cash FROM users WHERE gid = " + gid.id + " ORDER BY cash DESC LIMIT 25")
         if (!data || data.length == 0) return interaction.editReply({ embeds: [bot.prettyReply("Nikt nie ma nic do wypłacenia.", interaction)] })
         const payoutData = []
         let totalCash = 0
