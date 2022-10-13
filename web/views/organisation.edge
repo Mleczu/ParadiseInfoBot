@@ -129,8 +129,8 @@
                             <p class="text-primary m-0 fw-bold">Powiadomienia</p>
                         </div>
                         <div class="card-body">
+                            <div id="pingSubmitAlert"></div>
                             <div class="row mb-2">
-                                <div id="pingSubmitAlert"></div>
                                 <div class="col mb-3">
                                     <div class="form-check form-switch mb-1">
                                         <input class="form-check-input" type="checkbox" role="switch" id="switchPingGoodDeals">
@@ -140,13 +140,27 @@
                                 <div class="col mb-3">
                                     <div class="form-check form-switch mb-1">
                                         <input class="form-check-input" type="checkbox" role="switch" id="switchPing1DayLeft">
-                                        <label class="form-check-label" for="switchPing1DayLeft"><strong>1 dzień do wygaśnięcia</strong></label>
+                                        <label class="form-check-label" for="switchPing1DayLeft"><strong>1 dzień do wygaśnięcia bota</strong></label>
                                     </div>
                                 </div>
                                 <div class="col mb-3">
                                     <div class="form-check form-switch mb-1">
                                         <input class="form-check-input" type="checkbox" role="switch" id="switchPing3DaysLeft">
-                                        <label class="form-check-label" for="switchPing3DaysLeft"><strong>3 dni do wygaśnięcia</strong></label>
+                                        <label class="form-check-label" for="switchPing3DaysLeft"><strong>3 dni do wygaśnięcia bota</strong></label>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="row mb-2">
+                                <div class="col mb-3">
+                                    <div class="form-check form-switch mb-1">
+                                        <input class="form-check-input" type="checkbox" role="switch" id="switchPing1DayLeftWarehouse">
+                                        <label class="form-check-label" for="switchPing1DayLeftWarehouse"><strong>1 dzień do wygaśnięcia magazynu</strong></label>
+                                    </div>
+                                </div>
+                                <div class="col mb-3">
+                                    <div class="form-check form-switch mb-1">
+                                        <input class="form-check-input" type="checkbox" role="switch" id="switchPing3DaysLeftWarehouse">
+                                        <label class="form-check-label" for="switchPing3DaysLeftWarehouse"><strong>3 dni do wygaśnięcia magazynu</strong></label>
                                     </div>
                                 </div>
                                 <div class="mb-2"><button class="btn btn-primary btn-sm" type="submit" id="pingSubmit">Zapisz</button></div>

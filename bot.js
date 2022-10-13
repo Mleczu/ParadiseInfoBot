@@ -55,13 +55,13 @@ class Instance {
         this.createInterval(this.Login, 2 * 60 * 60 * 1000)
         this.createInterval(this.PublishInformation, 30 * 1000)
         this.createCronJob('0 */2 * * * *', this.ProcessLogs)
-        this.createCronJob('0 1 * * * *', this.CheckHotDeals);
         this.createCronJob('0 1 * * * *', this.LogWarehousePrices);
         this.createCronJob('0 0 * * * *', this.UpdateSettings);
         this.createCronJob('30 0 * * * *', this.Ping1DayLeft);
         this.createCronJob('30 0 * * * *', this.Ping3DaysLeft);
+        this.createCronJob('30 0 * * * *', this.Ping1DayLeftWarehouse);
+        this.createCronJob('30 0 * * * *', this.Ping3DaysLeftWarehouse);
         this.createCronJob('1 * * * * *', this.ProcessQueue);
-        // this.createCronJob('0 1 * * * *', this.Ping1DayWarehouse);
         return this
     }
 
@@ -314,43 +314,40 @@ class Instance {
     }
 
     async LogWarehousePrices() {
-        if (!this.settings.discord.channels.price_change) return;
-        if (this.settings.discord.channels.price_change.length == 0) return;
+        if (!this.settings.discord.channels.price_change && !this.settings.discord.channels.hot_deals) return;
+        if (this.settings.discord.channels.price_change.length == 0 && this.settings.discord.channels.hot_deals.length == 0) return;
         const data = await MakeRequest(this.token, this.groupUrl + "/warehouses", true)
         if (!data || !data.warehouse) return
         if (!data.warehouse.warehouse) return
         const vehicles = data.warehouse.warehouse.vehicles
-        let veh = []
-        for (const v of vehicles) {
-            const vehicleName = GetWarehouseNameMapping(v.vehicle_model)
-            veh.push({ name: vehicleName, value: NumberWithSpaces(v.vehicle_price) + "$", inline: true })
-        }
-        if (veh.length == 0) return;
-        this.bot.SendActionLog(this.group, "Zmiana cen - Wszystkie oferty", "price_change",  { fields: veh })
-    }
-
-    async CheckHotDeals() {
-        if (!this.settings.discord.channels.hot_deals) return;
-        if (this.settings.discord.channels.hot_deals.length == 0) return;
-        const data = await MakeRequest(this.token, this.groupUrl + "/warehouses", true)
-        if (!data || !data.warehouse) return
-        if (!data.warehouse.warehouse) return
-        const vehicles = data.warehouse.warehouse.vehicles
-        let hotDeals = []
-        for (const v of vehicles) {
-            const vehicleName = GetWarehouseNameMapping(v.vehicle_model)
-            const vd = await this.bot.database("SELECT * FROM export_prices WHERE gid = " + this.group + " AND model = '" + vehicleName + "' LIMIT 1")
-            if (!vd) continue;
-            if (vd.length == 0) continue;
-            const goodPrice = vd[0].price
-            if (goodPrice) {
-                if (v.vehicle_price > goodPrice) {
-                    hotDeals.push({ name: vehicleName, value: NumberWithSpaces(v.vehicle_price) + "$", inline: true })
-                }
+        if (this.settings.discord.channels.price_change && this.settings.discord.channels.price_change.length != 0) {
+            let veh = []
+            for (const v of vehicles) {
+                const vehicleName = GetWarehouseNameMapping(v.vehicle_model)
+                veh.push({ name: vehicleName, value: NumberWithSpaces(v.vehicle_price) + "$", inline: true })
+            }
+            if (veh.length != 0) {
+                this.bot.SendActionLog(this.group, "Zmiana cen - Wszystkie oferty", "price_change",  { fields: veh })
             }
         }
-        if (hotDeals.length == 0) return;
-        this.bot.SendActionLog(this.group, "Zmiana cen - Dobre oferty", "hot_deals", { fields: hotDeals, mention: (this.settings.discord.pings.switchPingGoodDeals || false) })
+        if (this.settings.discord.channels.hot_deals && this.settings.discord.channels.hot_deals.length != 0) {
+            let hotDeals = []
+            for (const v of vehicles) {
+                const vehicleName = GetWarehouseNameMapping(v.vehicle_model)
+                const vd = await this.bot.database("SELECT * FROM export_prices WHERE gid = " + this.group + " AND model = '" + vehicleName + "' LIMIT 1")
+                if (vd && vd.length != 0) {
+                    const goodPrice = vd[0].price
+                    if (goodPrice) {
+                        if (v.vehicle_price > goodPrice) {
+                            hotDeals.push({ name: vehicleName, value: NumberWithSpaces(v.vehicle_price) + "$", inline: true })
+                        }
+                    }
+                }
+            }
+            if (hotDeals.length != 0) {
+                this.bot.SendActionLog(this.group, "Zmiana cen - Dobre oferty", "hot_deals", { fields: hotDeals, mention: (this.settings.discord.pings.switchPingGoodDeals || false) })
+            }
+        }
     }
 
     async UpdateSettings() {
@@ -378,26 +375,58 @@ class Instance {
 
     async Ping1DayLeft() {
         if (!this.settings.discord.pings.switchPing1DayLeft) return
-        const pingDay = new Date(this.paid)
-        pingDay.setDate(pingDay.getDate() - 1)
-        const nowDay = new Date()
-        if (nowDay.getDate() != pingDay.getDate()) return
-        if (nowDay.getMonth() != pingDay.getMonth()) return
-        if (nowDay.getFullYear() != pingDay.getFullYear()) return
-        if (nowDay.getHours() != this.paid.getHours())
+        let pingDay = moment(this.paid).minute(0).seconds(0).milliseconds(0)
+        const paidDay = pingDay.dayOfYear()
+        pingDay = pingDay.dayOfYear((paidDay - 1))
+        const nowDay = moment().minute(0).seconds(0).milliseconds(0)
+        if (pingDay.dayOfYear() != nowDay.dayOfYear()) return
+        if (pingDay.year() != nowDay.year()) return
+        if (pingDay.month() != nowDay.month()) return
+        if (pingDay.hour() != nowDay.hour()) return
         this.bot.SendActionLog(this.group, "Opłata", "news", { message: "**Bot wygasa za** `1 dzień` " })
     }
 
     async Ping3DaysLeft() {
-        if (!this.settings.discord.pings.switchPing3DaysLeft) return
-        const pingDay = new Date(this.paid)
-        pingDay.setDate(pingDay.getDate() - 3)
-        const nowDay = new Date()
-        if (nowDay.getDate() != pingDay.getDate()) return
-        if (nowDay.getMonth() != pingDay.getMonth()) return
-        if (nowDay.getFullYear() != pingDay.getFullYear()) return
-        if (nowDay.getHours() != this.paid.getHours())
+        if (!this.settings.discord.pings.switchPing1DayLeft) return
+        let pingDay = moment(this.paid).minute(0).seconds(0).milliseconds(0)
+        const paidDay = pingDay.dayOfYear()
+        pingDay = pingDay.dayOfYear((paidDay - 3))
+        const nowDay = moment().minute(0).seconds(0).milliseconds(0)
+        if (pingDay.dayOfYear() != nowDay.dayOfYear()) return
+        if (pingDay.year() != nowDay.year()) return
+        if (pingDay.month() != nowDay.month()) return
+        if (pingDay.hour() != nowDay.hour()) return
         this.bot.SendActionLog(this.group, "Opłata", "news", { message: "**Bot wygasa za** `3 dni` " })
+    }
+
+    async Ping1DayLeftWarehouse() {
+        if (!this.settings.discord.pings.switchPing1DayLeftWarehouse) return
+        const data = await MakeRequest(this.token, this.groupUrl + "/warehouses", true)
+        if (!data || !data.warehouse) return
+        let pingDay = moment((data.warehouse.expires * 1000)).minute(0).seconds(0).milliseconds(0)
+        const paidDay = pingDay.dayOfYear()
+        pingDay = pingDay.dayOfYear((paidDay - 1))
+        const nowDay = moment().minute(0).seconds(0).milliseconds(0)
+        if (pingDay.dayOfYear() != nowDay.dayOfYear()) return
+        if (pingDay.year() != nowDay.year()) return
+        if (pingDay.month() != nowDay.month()) return
+        if (pingDay.hour() != nowDay.hour()) return
+        this.bot.SendActionLog(this.group, "Opłata", "news", { message: "**Magazyn wygasa za** `1 dzień` " })
+    }
+
+    async Ping3DaysLeftWarehouse() {
+        if (!this.settings.discord.pings.switchPing3DaysLeftWarehouse) return
+        const data = await MakeRequest(this.token, this.groupUrl + "/warehouses", true)
+        if (!data || !data.warehouse) return
+        let pingDay = moment((data.warehouse.expires * 1000)).minute(0).seconds(0).milliseconds(0)
+        const paidDay = pingDay.dayOfYear()
+        pingDay = pingDay.dayOfYear((paidDay - 3))
+        const nowDay = moment().minute(0).seconds(0).milliseconds(0)
+        if (pingDay.dayOfYear() != nowDay.dayOfYear()) return
+        if (pingDay.year() != nowDay.year()) return
+        if (pingDay.month() != nowDay.month()) return
+        if (pingDay.hour() != nowDay.hour()) return
+        this.bot.SendActionLog(this.group, "Opłata", "news", { message: "**Magazyn wygasa za** `3 dni` " })
     }
 
     async ProcessQueue() {
