@@ -1,5 +1,5 @@
 const Discord = require('discord.js');
-const config = require('../config')
+const config = require('../config').getConfig()
 
 module.exports = {
 	data: new Discord.SlashCommandBuilder()
