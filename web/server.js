@@ -1,4 +1,4 @@
-const config = require('../config.json')
+const config = require('../config').getConfig();
 const Database = require('../database/database')
 const express = require('express');
 const cookieSession = require('cookie-session')

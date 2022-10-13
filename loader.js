@@ -1,4 +1,4 @@
-const config = require('./config.json')
+const config = require('./config').getConfig();
 const Database = require('./database/database')
 const Discord = require('discord.js')
 const path = require('path')

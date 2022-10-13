@@ -1,4 +1,4 @@
-const config = require('../config.json')
+const config = require('../config').getConfig();
 const logger = require('../logger')
 const Database = require('./database')
 const con = new Database().connect(config.database)

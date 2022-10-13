@@ -1,5 +1,5 @@
 const Discord = require('discord.js')
-const config = require('./config.json')
+const config = require('./config')
 
 const replyEmbed = function(message, interaction, noAuthor, noGif) {
     const embed = new Discord.EmbedBuilder()
