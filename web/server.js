@@ -416,7 +416,6 @@ app.get('/queue/:id/:type', async (req, res) => {
 
 app.get('/api/gethash/:pass', async (req, res) => {
     if (!req.session.isLoggedIn) return res.status(403).json({ message: "Brak uprawnień" })
-    if (req.session.account.paradise_id != 1154) return res.status(403).json({ message: "Unauthorized" })
     const pass = req.params.pass
     if (!pass) return res.status(400).json({ message: "Pass parameter not found" })
     return res.json({ pass, hash: sha256(escape(pass)).toString() })
