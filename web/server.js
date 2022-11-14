@@ -531,6 +531,25 @@ app.patch('/api/exportPrices', async (req, res) => {
     return res.json({ message: "Loaded", success: true })
 })
 
+app.get('/api/warehouse', async (req, res) => {
+    if (!req.session.isLoggedIn) return res.status(403).json({ message: "Brak uprawnień" })
+    const data = await db("SELECT * FROM imports WHERE gid = " + req.session.account.paradise_id + " ORDER BY id ASC")
+    if (!data) return res.json([])
+    return res.json(data)
+})
+
+app.delete('/api/warehouse', async (req, res) => {
+    if (!req.session.isLoggedIn) return res.status(403).json({ message: "Brak uprawnień" })
+    let values = req.body
+    if (!values.data) return res.status(400).json({ message: "Bad request" })
+    console.log(values)
+    values = values.data
+    if (!values.id) return res.status(400).json({ message: "Bad request" })
+    const data = await db("DELETE FROM imports WHERE gid = " + req.session.account.paradise_id + " AND id = '" + values.id + "' LIMIT 1")
+    if (!data) return res.status(500).json({ message: "Server error" })
+    return res.json({ message: "Updated", success: true })
+})
+
 app.get('/api/members', async (req, res) => {
     if (!req.session.isLoggedIn) return res.status(403).json({ message: "Brak uprawnień" })
     const data = await db("SELECT uid,cash FROM users WHERE gid = " + req.session.account.paradise_id + " ORDER BY cash DESC")

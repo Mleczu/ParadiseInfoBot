@@ -71,6 +71,45 @@
             </div>
         </div>
     </div>
+    <div class="row mb-3">
+        <div class="col-lg-8">
+            <div class="card shadow mb-5">
+                <div class="card-header py-3">
+                    <p class="text-primary m-0 fw-bold">Lista pojazdów w magazynie</p>
+                </div>
+                <div class="card-body">
+                    <div id="removeVehicleAlert"></div>
+                    <div class="table-responsive table mt-2" id="warehouseTable" role="grid" aria-describedby="warehouseTable_info">
+                        <table class="table my-0" id="warehouseTable">
+                            <thead>
+                                <tr>
+                                    <th class="col-md-1">ID</th>
+                                    <th class="col-md-3">Model</th>
+                                    <th class="col-md-3">Importer</th>
+                                    <th class="col-md-1">Akcje</th>
+                                </tr>
+                            </thead>
+                            <tbody id="warehouseTableBody" class="align-middle">
+                            </tbody>
+                            <tfoot>
+                                <tr>
+                                    <th>ID</th>
+                                    <th>Model</th>
+                                    <th>Importer</th>
+                                    <th>Akcje</th>
+                                </tr>
+                            </tfoot>
+                        </table>
+                    </div>
+                    <div class="row">
+                        <div class="col-md-6 align-self-center">
+                            <p id="warehouseTable_info" class="dataTables_info" role="status" aria-live="polite">Pokazuje <span id="warehouseTable_resultCount">?</span> wyników</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
 </div>
 <script src="/assets/js/exportPrices.js"></script>
 @endsection
