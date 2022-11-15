@@ -1,5 +1,5 @@
 const logger = require('./logger')
-const { MakeRequest, NumberWithSpaces, CheckIfUserHasProfile, CreateUserProfile, GetWarehouseNameMapping, makeRequiredValues, GetQueueNameMapping } = require('./functions')
+const { MakeRequest, NumberWithSpaces, CheckIfUserHasProfile, CreateUserProfile, GetWarehouseNameMapping, makeRequiredValues, GetQueueNameMapping, GetMaxImportPrice } = require('./functions')
 const cron = require('cron').CronJob;
 const moment = require('moment');
 
@@ -165,7 +165,12 @@ class Instance {
     }
     
     async InsertImport(user, vehicle) {
-        await this.bot.database("INSERT INTO `imports` (`gid`, `uid`, `vehicle`) VALUES ('" + this.group + "','" + user.id + "','" + vehicle + "')")
+        const modifier = await this.GetPaymentModifier(user, "import")
+        if (modifier.instantPayout) {
+            this.AddCash(user, Math.floor(GetMaxImportPrice(vehicle) * (4 / 100)), "import")
+        } else {
+            await this.bot.database("INSERT INTO `imports` (`gid`, `uid`, `vehicle`) VALUES ('" + this.group + "','" + user.id + "','" + vehicle + "')")
+        }
     }
     
     async GetRank(id) {
@@ -190,8 +195,8 @@ class Instance {
         const table = tempSettings.payouts[type]
         if (table[rank]) return table[rank]
         if (table["*"]) return table["*"]
-        if (type == "export") return { count: 0, percent: true }
-        return { count: 50, percent: true }
+        if (type == "export") return { count: 0, percent: true, instantPayout: false }
+        return { count: 50, percent: true, instantPayout: false }
     }
     
     async GetImporterData(vehicle) {
@@ -252,10 +257,7 @@ class Instance {
                 this.IncreaseCount(author, "export")
                 this.AddCash(author, data[2], "export")
                 const importerData = await this.GetImporterData(data[1])
-                if (!importerData) {
-                    this.bot.SendActionLog(this.group, author, type, { importer: "Brak danych", vehicle: data[1], price: data[2], experience: data[3] })
-                    break;
-                }
+                if (!importerData) break;
                 await this.RemoveImporterData(importerData.uid, data[1])
                 this.AddCash({ id: importerData.uid }, data[2], "import")
                 let importerName = await this.bot.paradise.GetUserById(importerData.uid);

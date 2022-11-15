@@ -66,7 +66,7 @@ const CreateDiscordBot = () => {
     bot.paradise.cache = []
     bot.paradise.GetUserByName = async (name) => {
         if (bot.paradise.cache.filter(m => m.ttl > Date.now()).map(m => m.login).includes(name)) return bot.paradise.cache.filter(m => m.ttl > Date.now() && m.login == name)[0]
-        if (name.match(/^[^ĄąĆćĘęŁłŃńÓóŚśŹźŻż]/)) return;
+        // if (name.match(/^[^ĄąĆćĘęŁłŃńÓóŚśŹźŻż]/)) return;
         const data = await MakeRequest("", "https://ucp.paradise-rpg.pl/api/search?login=" + name, false)
         if (!data || data.length == 0) return;
         let user = data.filter(d => d.login.toLowerCase() == name.toLowerCase())

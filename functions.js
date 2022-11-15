@@ -249,6 +249,40 @@ const queueNames = {
     "artifact": "Artefakt"
 }
 
+const maxImportPrices = {
+    "Reaper": 15000000,
+    "Fusion": 12000000,
+    "Venom": 7800000,
+    "Wraith": 6300000,
+    "Rattler": 5700000,
+    "Bulldog": 5250000,
+    "Diablo": 4120000,
+    "Magnum": 3750000,
+    "Hammerhead": 3000000,
+    "Torrero": 2250000,
+    "Titan": 1500000,
+    "Soprano": 1500000,
+    "Turismo": 2370000,
+    "Bullet": 2150000,
+    "Infernus": 1996500,
+    "Walnus": 1500000,
+    "Banshee": 1306500,
+    "Cheetah": 1234500,
+    "Sultan": 1045500,
+    "Elegy": 987000,
+    "Hotknife": 915000,
+    "Comet": 842250,
+    "Jester": 769500,
+    "Uranus": 652500,
+    "Super GT": 580500,
+    "Flash": 508500,
+    "ZR-350": 500850
+}
+
+const GetMaxImportPrice = (vehicle) => {
+    return maxImportPrices[`${vehicle}`] || 0
+}
+
 const GetWarehouseNameMapping = (id) => {
     return warehouseNameMappings[`${id}`] || "unknown"
 }
@@ -383,4 +417,4 @@ const makeRequiredValues = (json) => {
     return json
 }
 
-module.exports = { MakeRequest, CheckIfUserHasProfile, CreateUserProfile, NumberWithSpaces, GetWarehouseNameMapping, GetWarehousePriceMapping, makeRequiredValues, GetChannelNameMapping, GetQueueNameMapping, GetReverseQueueNameMapping }
+module.exports = { MakeRequest, CheckIfUserHasProfile, CreateUserProfile, NumberWithSpaces, GetWarehouseNameMapping, GetWarehousePriceMapping, makeRequiredValues, GetChannelNameMapping, GetQueueNameMapping, GetReverseQueueNameMapping, GetMaxImportPrice }
