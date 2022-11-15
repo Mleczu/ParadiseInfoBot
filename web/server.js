@@ -541,7 +541,6 @@ app.delete('/api/warehouse', async (req, res) => {
     if (!req.session.isLoggedIn) return res.status(403).json({ message: "Brak uprawnień" })
     let values = req.body
     if (!values.data) return res.status(400).json({ message: "Bad request" })
-    console.log(values)
     values = values.data
     if (!values.id) return res.status(400).json({ message: "Bad request" })
     const data = await db("DELETE FROM imports WHERE gid = " + req.session.account.paradise_id + " AND id = '" + values.id + "' LIMIT 1")
@@ -655,8 +654,6 @@ app.post('/api/queue/edit', async (req, res) => {
 app.post('/api/queue/delete', async (req, res) => {
     if (!req.session.isLoggedIn) return res.status(403).json({ message: "Brak uprawnień" })
     if (!req.body.data.where || !req.body.data.date) return res.status(400).json({ message: "Bad request" })
-    console.log(req.body.data.where)
-    console.log(req.body.data.date)
     await db("UPDATE queue SET user = NULL WHERE `gid` = " + req.session.account.paradise_id + " AND `type` = '" + req.body.data.where + "' AND `date` = '" + req.body.data.date + "' LIMIT 1")
     return res.json({ message: "Updated", success: true })
 })
