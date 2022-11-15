@@ -257,7 +257,10 @@ class Instance {
                 this.IncreaseCount(author, "export")
                 this.AddCash(author, data[2], "export")
                 const importerData = await this.GetImporterData(data[1])
-                if (!importerData) break;
+                if (!importerData) {
+                    this.bot.SendActionLog(this.group, author, type, { vehicle: data[1], price: data[2], experience: data[3] })
+                    break
+                };
                 await this.RemoveImporterData(importerData.uid, data[1])
                 this.AddCash({ id: importerData.uid }, data[2], "import")
                 let importerName = await this.bot.paradise.GetUserById(importerData.uid);

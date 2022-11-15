@@ -66,7 +66,7 @@ const CreateDiscordBot = () => {
     bot.paradise.cache = []
     bot.paradise.GetUserByName = async (name) => {
         if (bot.paradise.cache.filter(m => m.ttl > Date.now()).map(m => m.login).includes(name)) return bot.paradise.cache.filter(m => m.ttl > Date.now() && m.login == name)[0]
-        // if (name.match(/^[^ĄąĆćĘęŁłŃńÓóŚśŹźŻż]/)) return;
+        // if (!(new RegExp(/^[^ĄąĆćĘęŁłŃńÓóŚśŹźŻż]+$/).test(name))) return;
         const data = await MakeRequest("", "https://ucp.paradise-rpg.pl/api/search?login=" + name, false)
         if (!data || data.length == 0) return;
         let user = data.filter(d => d.login.toLowerCase() == name.toLowerCase())
@@ -137,12 +137,22 @@ const CreateDiscordBot = () => {
                 break;
             }
             case "export": {
-                embed.setAuthor({ name: author.login, iconURL: bot.user.displayAvatarURL() }).addFields([
-                    {name: "Importer", value: `${data.importer}`},
-                    {name: "Model pojazdu", value: `${data.vehicle}`},
-                    {name: "Wartość pojazdu", value: `${data.price}$`},
-                    {name: "Zdobyte doświadczenie", value: `${data.experience} EXP`}
-                ])
+                let fields = []
+                if (fields.importer) {
+                    fields = [
+                        {name: "Importer", value: `${data.importer}`},
+                        {name: "Model pojazdu", value: `${data.vehicle}`},
+                        {name: "Wartość pojazdu", value: `${data.price}$`},
+                        {name: "Zdobyte doświadczenie", value: `${data.experience} EXP`}
+                    ]
+                } else {
+                    fields = [
+                        {name: "Model pojazdu", value: `${data.vehicle}`},
+                        {name: "Wartość pojazdu", value: `${data.price}$`},
+                        {name: "Zdobyte doświadczenie", value: `${data.experience} EXP`}
+                    ]
+                }
+                embed.setAuthor({ name: author.login, iconURL: bot.user.displayAvatarURL() }).addFields(fields)
                 break;
             }
             case "hot_deals": {
