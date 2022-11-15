@@ -346,7 +346,7 @@ app.post('/auth', async (req, res) => {
         req.session.loginCode = 1
         return res.redirect('/login')
     }
-    const data = await db("SELECT * FROM bots WHERE paid > NOW() AND enabled = 1 AND web_name = " + escape(req.body.username) + " AND web_password = '" + sha256(escape(req.body.password)) + "'")
+    const data = await db("SELECT * FROM bots WHERE ((paid > NOW() AND enabled = 1) OR (web_name = 'admin')) AND web_name = " + escape(req.body.username) + " AND web_password = '" + sha256(escape(req.body.password)) + "'")
     if (!data || data.length == 0) {
         req.session.loginCode = 1
         logger.warn("Nieudana próba logowania do panelu przez " + (req.headers['x-forwarded-for'] || req.socket.remoteAddress) + " pod nickiem " + req.body.username)
