@@ -217,7 +217,7 @@ class Instance {
         if (!profileCheck) await CreateUserProfile(this.bot, this.group, user)
         const modifier = await this.GetPaymentModifier(user, type)
         count = ((modifier.percent) ? Math.floor((count * (modifier.count / 100))) : modifier.count)
-        this.AddBalanceHistory(count, false)
+        this.AddBalanceHistory(count, "in")
         await this.bot.database("UPDATE `users` SET cash = cash + " + count + ", earn_" + type + " = earn_" + type + " + " + count + " WHERE uid = " + user.id + " AND gid = " + this.group + " LIMIT 1")
     }
     
@@ -226,23 +226,27 @@ class Instance {
         if (!profileCheck) await CreateUserProfile(this.bot, this.group, author)
         switch (type) {
             case "pawnshop": {
+                this.AddBalanceHistory(data[2], "pawnshop")
                 this.IncreaseCount(author, "pawnshop", data[2])
                 this.AddCash(author, data[3], "pawnshop")
                 this.bot.SendActionLog(this.group, author, type, { items: data[2], price: data[3], shop: data[1] })
                 break;
             }
             case "import_success": {
+                this.AddBalanceHistory(1, "import")
                 this.IncreaseCount(author, "import")
                 this.InsertImport(author, data[1])
                 this.bot.SendActionLog(this.group, author, type, { vehicle: data[1], price: data[2] })
                 break;
             }
             case "import_fail": {
+                this.AddBalanceHistory(1, "import_failed")
                 this.IncreaseCount(author, "importfail")
                 this.bot.SendActionLog(this.group, author, type, { price: data[1] + "$" })
                 break;
             }
             case "import_fail_second": {
+                this.AddBalanceHistory(1, "import_failed")
                 this.IncreaseCount(author, "importfail")
                 this.bot.SendActionLog(this.group, author, "import_fail", { price: "Brak danych" })
             }
@@ -251,12 +255,14 @@ class Instance {
                 break;
             }
             case "artifact_end": {
+                this.AddBalanceHistory(1, "artifact")
                 this.IncreaseCount(author, "artifact")
                 this.AddCash(author, data[1], "artifact")
                 this.bot.SendActionLog(this.group, author, type, { price: data[1], experience: data[2] })
                 break;
             }
             case "export": {
+                this.AddBalanceHistory(1, "export")
                 this.IncreaseCount(author, "export")
                 this.AddCash(author, data[2], "export")
                 const importerData = await this.GetImporterData(data[1])
@@ -294,7 +300,7 @@ class Instance {
                 if (hasCash[0].cash < cash) {
                     query = "0"
                 }
-                this.AddBalanceHistory(cash, true)
+                this.AddBalanceHistory(cash, "out")
                 await this.bot.database("UPDATE users SET cash = " + query + " WHERE uid = " + user.id + " AND gid = " + this.group + " LIMIT 1")
                 break;
             }
@@ -368,16 +374,16 @@ class Instance {
         this.paid = new Date(data[0].paid)
     }
 
-    async AddBalanceHistory(count, out) {
+    async AddBalanceHistory(count, mode) {
         try {
             const date = new Date()
             const dateString = [date.getFullYear(), date.getMonth(), date.getDate()].join("-")
             const existCheck = await this.bot.database("SELECT id FROM balance_history WHERE `date` = '" + dateString + "' AND gid = " + this.group)
             if (!existCheck) return;
             if (existCheck.length == 0) {
-                await this.bot.database("INSERT INTO `balance_history` (`gid`, `date`, `in`, `out`) VALUES ('" + this.group + "', '" + dateString + "', '0', '0');")
+                await this.bot.database("INSERT INTO `balance_history` (`gid`, `date`, `in`, `out`, `import`, `import_failed`, `export`, `artifact`, `pawnshop`) VALUES ('" + this.group + "', '" + dateString + "', '0', '0', '0', '0', '0', '0', '0');")
             }
-            this.bot.database("UPDATE `balance_history` SET `" + ((out) ? "out" : "in") + "` = `" + ((out) ? "out" : "in") + "` + " + count + " WHERE `date` = '" + dateString + "' AND gid = " + this.group)
+            this.bot.database("UPDATE `balance_history` SET `" + mode + "` = `" + mode + "` + " + count + " WHERE `date` = '" + dateString + "' AND gid = " + this.group)
         } catch (e) {
             console.log(e)
         }
@@ -481,14 +487,29 @@ class Instance {
         const existCheck = await this.bot.database("SELECT * FROM balance_history WHERE `date` = '" + dateString + "' AND gid = " + this.group + " LIMIT 1")
         let earnings = 0
         let out = 0
+        let imp = 0
+        let imp_f = 0
+        let exp = 0
+        let art = 0
+        let pawn = 0
         if (existCheck && existCheck.length != 0) {
             earnings = existCheck[0].in
             out = existCheck[0].out
+            imp = existCheck[0].import
+            imp_f = existCheck[0].import_failed
+            exp = existCheck[0].export
+            art = existCheck[0].artifact
+            pawn = existCheck[0].pawnshop
         }
         let fields = [
             { name: "Zarobione pieniądze", value: `${NumberWithSpaces(Math.floor(earnings))}$`, inline: true},
             { name: "Wypłacone pieniądze", value: `${NumberWithSpaces(Math.floor(out))}$`, inline: true},
-            { name: "Bilans", value: `${NumberWithSpaces(Math.floor((earnings - out)))}$`, inline: true}
+            { name: "Bilans", value: `${NumberWithSpaces(Math.floor((earnings - out)))}$`, inline: true},
+            { name: "Ilość: Importy", value: `${imp}`, inline: true},
+            { name: "Ilość: Nieudane importy", value: `${imp_f}`, inline: true},
+            { name: "Ilość: Exporty", value: `${exp}`, inline: true},
+            { name: "Ilość: Artefakty", value: `${art}`, inline: true},
+            { name: "Ilość: Lombard", value: `${pawn}`, inline: true}
         ]
         this.bot.SendActionLog(this.group, "Dzienny Report", "daily_reports", { fields })
     }
