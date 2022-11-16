@@ -166,10 +166,11 @@ class Instance {
     
     async InsertImport(user, vehicle) {
         const modifier = await this.GetPaymentModifier(user, "import")
-        console.log(modifier.instantPayout)
         if (modifier.instantPayout == true) {
+            logger.log("Dodawanie nagrody za import dla " + user + " (" + vehicle + ") w organizacji " + this.group)
             this.AddCash(user, Math.floor(GetMaxImportPrice(vehicle) * (4 / 100)), "import")
         } else {
+            logger.log("Dodawanie importu do kolejki dla " + user + " (" + vehicle + ") w organizacji " + this.group)
             await this.bot.database("INSERT INTO `imports` (`gid`, `uid`, `vehicle`) VALUES ('" + this.group + "','" + user.id + "','" + vehicle + "')")
         }
     }
@@ -259,9 +260,11 @@ class Instance {
                 this.AddCash(author, data[2], "export")
                 const importerData = await this.GetImporterData(data[1])
                 if (!importerData) {
+                    logger.log("Brak o importerze dla pojazdu " + data[1] + " w organizacji " + this.group)
                     this.bot.SendActionLog(this.group, author, type, { vehicle: data[1], price: data[2], experience: data[3] })
                     break
                 };
+                logger.log("Pojazd " + data[1] + " zimportowany przez " + importerName.login + " w organizacji " + this.group)
                 await this.RemoveImporterData(importerData.uid, data[1])
                 this.AddCash({ id: importerData.uid }, data[2], "import")
                 let importerName = await this.bot.paradise.GetUserById(importerData.uid);
