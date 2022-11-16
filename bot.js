@@ -264,11 +264,11 @@ class Instance {
                     this.bot.SendActionLog(this.group, author, type, { vehicle: data[1], price: data[2], experience: data[3] })
                     break
                 };
-                logger.log("Pojazd " + data[1] + " zimportowany przez " + importerName.login + " w organizacji " + this.group)
                 await this.RemoveImporterData(importerData.uid, data[1])
                 this.AddCash({ id: importerData.uid }, data[2], "import")
                 let importerName = await this.bot.paradise.GetUserById(importerData.uid);
                 if (!importerName) importerName = { login: "Nieznany" }
+                logger.log("Pojazd " + data[1] + " zimportowany przez " + importerName.login + " w organizacji " + this.group)
                 this.bot.SendActionLog(this.group, author, type, { importer: importerName.login, vehicle: data[1], price: data[2], experience: data[3] })
                 break;
             }
