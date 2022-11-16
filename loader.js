@@ -168,6 +168,9 @@ const CreateDiscordBot = () => {
                 embed.setAuthor({ name: author, iconURL: bot.user.displayAvatarURL() }).setDescription(data.message)
                 break;
             }
+            case "daily_report": {
+                embed.setAuthor({ name: author, iconURL: bot.user.displayAvatarURL() }).setDescription(data.fields)
+            }
         }
         channel.send({embeds: [embed]})
         } catch(e) {}

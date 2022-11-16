@@ -233,6 +233,7 @@ const channelMappings = {
     "channelPawnshop": "pawnshop",
     "channelPriceChange": "price_change",
     "channelHotDeals": "hot_deals",
+    "channelDailyReports": "daily_reports",
     "news": "channelNews",
     "import_success": "channelImport",
     "import_fail": "channelImportFailed",
@@ -241,7 +242,8 @@ const channelMappings = {
     "export": "channelExport",
     "pawnshop": "channelPawnshop",
     "price_change": "channelPriceChange",
-    "hot_deals": "channelHotDeals"
+    "hot_deals": "channelHotDeals",
+    "daily_reports": "channelDailyReports"
 }
 
 const queueNames = {

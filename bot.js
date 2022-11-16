@@ -62,6 +62,7 @@ class Instance {
         this.createCronJob('30 0 * * * *', this.Ping1DayLeftWarehouse);
         this.createCronJob('30 0 * * * *', this.Ping3DaysLeftWarehouse);
         this.createCronJob('1 * * * * *', this.ProcessQueue);
+        this.createCronJob('0 59 23 * * *', this.GenerateDailyReport);
         return this
     }
 
@@ -471,6 +472,25 @@ class Instance {
         const data = await this.bot.database("SELECT * FROM queue WHERE `gid` = " + this.group + " AND `type` = '" + type + "' AND `date` = '" + date + "'")
         if (!data || data.length == 0) return
         return data[0]
+    }
+
+    async GenerateDailyReport() {
+        if (!(this.settings.discord.channels.daily_reports && this.settings.discord.channels.daily_report.length != 0)) return
+        const date = new Date()
+        const dateString = [date.getFullYear(), date.getMonth(), date.getDate()].join("-")
+        const existCheck = await this.bot.database("SELECT * FROM balance_history WHERE `date` = '" + dateString + "' AND gid = " + this.group + " LIMIT 1")
+        let earnings = 0
+        let out = 0
+        if (existCheck && existCheck.length != 0) {
+            earnings = existCheck[0].in
+            out = existCheck[0].out
+        }
+        let fields = [
+            { name: "Zarobione pieniądze", value: `${NumberWithSpaces(Math.floor(earnings))}$`, inline: true},
+            { name: "Wypłacone pieniądze", value: `${NumberWithSpaces(Math.floor(out))}$`, inline: true},
+            { name: "Bilans", value: `${NumberWithSpaces(Math.floor((earnings - out)))}$`, inline: true}
+        ]
+        this.bot.SendActionLog(this.group, "Dzienny Report", "daily_reports", { fields })
     }
 }
 
