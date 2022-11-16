@@ -166,7 +166,8 @@ class Instance {
     
     async InsertImport(user, vehicle) {
         const modifier = await this.GetPaymentModifier(user, "import")
-        if (modifier.instantPayout) {
+        console.log(modifier.instantPayout)
+        if (modifier.instantPayout == true) {
             this.AddCash(user, Math.floor(GetMaxImportPrice(vehicle) * (4 / 100)), "import")
         } else {
             await this.bot.database("INSERT INTO `imports` (`gid`, `uid`, `vehicle`) VALUES ('" + this.group + "','" + user.id + "','" + vehicle + "')")
