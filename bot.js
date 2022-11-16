@@ -268,7 +268,7 @@ class Instance {
                 const importerData = await this.GetImporterData(data[1])
                 if (!importerData) {
                     logger.info("Brak o importerze dla pojazdu " + data[1] + " w organizacji " + this.group)
-                    this.bot.SendActionLog(this.group, author, type, { vehicle: data[1], price: data[2], experience: data[3] })
+                    this.bot.SendActionLog(this.group, author, type, { importer: false, vehicle: data[1], price: data[2], experience: data[3] })
                     break
                 };
                 await this.RemoveImporterData(importerData.uid, data[1])
