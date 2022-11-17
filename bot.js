@@ -168,10 +168,10 @@ class Instance {
     async InsertImport(user, vehicle) {
         const modifier = await this.GetPaymentModifier(user, "import")
         if (modifier.instantPayout == true) {
-            logger.info("Dodawanie nagrody za import dla " + user + " (" + vehicle + ") w organizacji " + this.group)
+            logger.info("Dodawanie nagrody za import dla " + user.id + " (" + vehicle + ") w organizacji " + this.group)
             this.AddCash(user, Math.floor(GetMaxImportPrice(vehicle) * (4 / 100)), "import")
         } else {
-            logger.info("Dodawanie importu do kolejki dla " + user + " (" + vehicle + ") w organizacji " + this.group)
+            logger.info("Dodawanie importu do kolejki dla " + user.id + " (" + vehicle + ") w organizacji " + this.group)
             await this.bot.database("INSERT INTO `imports` (`gid`, `uid`, `vehicle`) VALUES ('" + this.group + "','" + user.id + "','" + vehicle + "')")
         }
     }

@@ -48,7 +48,7 @@ channelSubmit.onclick = async (e) => {
     const settings = document.querySelectorAll(`[id^="channel"]`);
     const values = []
     for (const i of settings) {
-        if ((i.value != null && i.value.length > 10 && !isNaN(i.value)) || (i.value == "")) {
+        if ((i.value != null && !isNaN(i.value))) {
             values.push({ name: i.id, value: i.value })
         }
     }
@@ -57,6 +57,7 @@ channelSubmit.onclick = async (e) => {
         showAlert("settingsSubmitAlert", "warning", "<strong>Nie udało się zapisać ustawień!</strong> Brak zmian")
         return
     }
+    console.log(values)
     const data = await fetch("/api/channels", {
         method: "POST",
         headers: {

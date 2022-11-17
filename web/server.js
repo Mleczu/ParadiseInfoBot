@@ -9,6 +9,7 @@ const db = Database.connect(config.database)
 const { escape } = require('mysql')
 const sha256 = require("crypto-js/sha256");
 const moment = require('moment')
+const Discord = require('discord.js')
 
 const { GetChannelNameMapping } = require('../functions')
 
@@ -663,6 +664,17 @@ app.get('/api/paradise/:id', async (req, res) => {
     if (!req.params.id || isNaN(req.params.id)) return res.status(400).json({ message: "Bad request" })
     const data = await bot.paradise.GetUserById(req.params.id)
     return res.json({ id: req.params.id, account: data || {login: "Brak danych"} })
+})
+
+app.get('/api/discordList', async (req, res) => {
+    if (!req.session.isLoggedIn) return res.status(403).json({ message: "Brak uprawnień" })
+    const query = await db("SELECT discord_id, settings FROM bots WHERE paradise_id = " + req.session.account.paradise_id + " LIMIT 1")
+    if (!query || query.length == 0) return res.json({data: { channels: [], roles: [] }})
+    const server = await bot.guilds.fetch(query[0].discord_id)
+    if (!server) return res.json({data: { channels: [], roles: [] }})
+    const channels = server.channels.cache.filter(c => c.type == Discord.ChannelType.GuildText).sort((a, b) => a.rawPosition - b.rawPosition ).map(c => {return { id: c.id, name: c.name, position: c.rawPosition }})
+    const roles = server.roles.cache.filter(c => c.managed == true).sort((a, b) => a.rawPosition - b.rawPosition ).map(c => {return { id: c.id, name: c.name, position: c.rawPosition }})
+    return res.json({data: { channels, roles }})
 })
 
 app.get('*', (req, res) => {

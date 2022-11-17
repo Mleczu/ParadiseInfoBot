@@ -3,6 +3,7 @@ const LoadData = async () => {
     if (!data) return
     for (const k in data) {
         const d = data[k]
+        document.getElementById('queue_' + k + '_channel').value = d.channel
         document.getElementById('queue_' + k + '_time').value = d.time
         document.getElementById('queue_' + k + '_status').checked = d.status
         let tableData = ''
