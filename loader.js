@@ -138,7 +138,7 @@ const CreateDiscordBot = () => {
             }
             case "export": {
                 let fields = []
-                if (fields.importer) {
+                if (data.importer && data.importer != undefined) {
                     fields = [
                         {name: "Importer", value: `${data.importer}`},
                         {name: "Model pojazdu", value: `${data.vehicle}`},
