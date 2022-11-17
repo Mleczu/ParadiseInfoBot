@@ -51,7 +51,6 @@ class Instance {
         this.isEnabled = true
         this.paid = this.data.paid
         await this.Login()
-        this.GenerateDailyReport()
         this.ProcessQueue()
         this.createInterval(this.Login, 2 * 60 * 60 * 1000)
         this.createInterval(this.PublishInformation, 30 * 1000)
