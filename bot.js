@@ -51,6 +51,7 @@ class Instance {
         this.isEnabled = true
         this.paid = this.data.paid
         await this.Login()
+        this.GenerateDailyReport()
         this.ProcessQueue()
         this.createInterval(this.Login, 2 * 60 * 60 * 1000)
         this.createInterval(this.PublishInformation, 30 * 1000)
@@ -481,7 +482,7 @@ class Instance {
     }
 
     async GenerateDailyReport() {
-        if (!(this.settings.discord.channels.daily_reports && this.settings.discord.channels.daily_report.length != 0)) return
+        if (!(this.settings.discord.channels.daily_reports && this.settings.discord.channels.daily_reports.length != 0)) return
         const date = new Date()
         const dateString = [date.getFullYear(), date.getMonth(), date.getDate()].join("-")
         const existCheck = await this.bot.database("SELECT * FROM balance_history WHERE `date` = '" + dateString + "' AND gid = " + this.group + " LIMIT 1")
