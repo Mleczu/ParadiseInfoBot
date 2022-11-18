@@ -416,10 +416,10 @@ const makeRequiredValues = (json) => {
     if (!json.queue) json.queue = {}
     if (!json.queue.import) json.queue.import = { status: false, time: 6, channel: "" }
     if (!json.queue.artifact) json.queue.artifact = { status: false, time: 6, channel: "" }
-    if (!json.autoedit) json.queue.autoedit = {}
-    if (!json.autoedit.queues) json.queue.autoedit.queues = {}
-    if (!json.autoedit.queues.import) json.queue.autoedit.queues.import = { status: false, channel: "", message: "" }
-    if (!json.autoedit.queues.artifact) json.queue.autoedit.queues.artifact = { status: false, channel: "", message: "" }
+    if (!json.autoedit) json.autoedit = {}
+    if (!json.autoedit.queues) json.autoedit.queues = {}
+    if (!json.autoedit.queues.import) json.autoedit.queues.import = { status: false, channel: "", message: "" }
+    if (!json.autoedit.queues.artifact) json.autoedit.queues.artifact = { status: false, channel: "", message: "" }
     return json
 }
 
