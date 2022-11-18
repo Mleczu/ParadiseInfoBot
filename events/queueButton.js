@@ -63,6 +63,7 @@ module.exports = {
                             value: dv.format('YYYY-MM-DD_HH:mm')
                         })
                     }
+                    console.log(o)
                     r.addComponents(
                         new Discord.SelectMenuBuilder()
                             .setCustomId('queue_submitregister_' + cidData[2] + "_" + k)
