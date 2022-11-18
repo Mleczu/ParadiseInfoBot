@@ -1,5 +1,5 @@
 const logger = require('./logger')
-const { MakeRequest, NumberWithSpaces, CheckIfUserHasProfile, CreateUserProfile, GetWarehouseNameMapping, makeRequiredValues, GetQueueNameMapping, GetMaxImportPrice } = require('./functions')
+const { MakeRequest, NumberWithSpaces, CheckIfUserHasProfile, CreateUserProfile, GetWarehouseNameMapping, makeRequiredValues, GetMaxImportPrice } = require('./functions')
 const cron = require('cron').CronJob;
 const moment = require('moment');
 
@@ -56,7 +56,7 @@ class Instance {
         this.createInterval(this.PublishInformation, 30 * 1000)
         this.createCronJob('0 */2 * * * *', this.ProcessLogs)
         this.createCronJob('0 1 * * * *', this.LogWarehousePrices);
-        this.createCronJob('0 0 * * * *', this.UpdateSettings);
+        this.createCronJob('0 * * * * *', this.UpdateSettings);
         this.createCronJob('30 0 * * * *', this.Ping1DayLeft);
         this.createCronJob('30 0 * * * *', this.Ping3DaysLeft);
         this.createCronJob('30 0 * * * *', this.Ping1DayLeftWarehouse);
@@ -169,7 +169,7 @@ class Instance {
         const modifier = await this.GetPaymentModifier(user, "import")
         if (modifier.instantPayout == true) {
             logger.info("Dodawanie nagrody za import dla " + user.id + " (" + vehicle + ") w organizacji " + this.group)
-            this.AddCash(user, Math.floor(GetMaxImportPrice(vehicle) * (4 / 100)), "import")
+            this.AddCash(user, Math.floor(GetMaxImportPrice(vehicle) * (4 / 100)), "import", true)
         } else {
             logger.info("Dodawanie importu do kolejki dla " + user.id + " (" + vehicle + ") w organizacji " + this.group)
             await this.bot.database("INSERT INTO `imports` (`gid`, `uid`, `vehicle`) VALUES ('" + this.group + "','" + user.id + "','" + vehicle + "')")
@@ -212,12 +212,12 @@ class Instance {
         await this.bot.database("DELETE FROM imports WHERE vehicle = '" + vehicle + "' AND gid = " + this.group + " AND uid = " + importer + " ORDER BY id DESC LIMIT 1")
     }
     
-    async AddCash(user, count, type) {
+    async AddCash(user, count, type, dontAddHistory = false) {
         const profileCheck = await CheckIfUserHasProfile(this.bot, this.group, user)
         if (!profileCheck) await CreateUserProfile(this.bot, this.group, user)
         const modifier = await this.GetPaymentModifier(user, type)
         count = ((modifier.percent) ? Math.floor((count * (modifier.count / 100))) : modifier.count)
-        this.AddBalanceHistory(count, "in")
+        if (!dontAddHistory) this.AddBalanceHistory(count, "in")
         await this.bot.database("UPDATE `users` SET cash = cash + " + count + ", earn_" + type + " = earn_" + type + " + " + count + " WHERE uid = " + user.id + " AND gid = " + this.group + " LIMIT 1")
     }
     
@@ -268,6 +268,7 @@ class Instance {
                 const importerData = await this.GetImporterData(data[1])
                 if (!importerData || importerData == undefined) {
                     logger.info("Brak o importerze dla pojazdu " + data[1] + " w organizacji " + this.group)
+                    this.AddBalanceHistory(data[2], "in")
                     this.bot.SendActionLog(this.group, author, type, { importer: false, vehicle: data[1], price: data[2], experience: data[3] })
                     break
                 };

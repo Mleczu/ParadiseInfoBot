@@ -11,7 +11,7 @@ const sha256 = require("crypto-js/sha256");
 const moment = require('moment')
 const Discord = require('discord.js')
 
-const { GetChannelNameMapping } = require('../functions')
+const { GetChannelNameMapping, makeRequiredValues } = require('../functions')
 
 let bot
 
@@ -282,22 +282,6 @@ const hoursSet = {
     12: "12 godzin",
     24: "24 godziny",
     48: "48 godzin"
-}
-
-const makeRequiredValues = (json) => {
-    if (!json.discord) json.discord = {}
-    if (!json.discord.channels) json.discord.channels = {}
-    if (!json.discord.pings) json.discord.pings = {}
-    if (!json.client) json.client = {}
-    if (!json.payouts) json.payouts = {}
-    if (!json.payouts.import) json.payouts.import = {}
-    if (!json.payouts.export) json.payouts.export = {}
-    if (!json.payouts.artifact) json.payouts.artifact = {}
-    if (!json.payouts.pawnshop) json.payouts.pawnshop = {}
-    if (!json.queue) json.queue = {}
-    if (!json.queue.import) json.queue.import = { status: false, time: 6, channel: "" }
-    if (!json.queue.artifact) json.queue.artifact = { status: false, time: 6, channel: "" }
-    return json
 }
 
 const app = express()
