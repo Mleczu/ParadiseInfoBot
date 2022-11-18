@@ -58,12 +58,13 @@ module.exports = {
                     const r = new Discord.ActionRowBuilder()
                     let o = []
                     for (const dv of d) {
-                        o.push({
-                            label: dv.format('YYYY-MM-DD HH:mm'),
-                            value: dv.format('YYYY-MM-DD_HH:mm')
-                        })
+                        if (o.length < 25) {
+                            o.push({
+                                label: dv.format('YYYY-MM-DD HH:mm'),
+                                value: dv.format('YYYY-MM-DD_HH:mm')
+                            })
+                        }
                     }
-                    console.log(o)
                     r.addComponents(
                         new Discord.SelectMenuBuilder()
                             .setCustomId('queue_submitregister_' + cidData[2] + "_" + k)
