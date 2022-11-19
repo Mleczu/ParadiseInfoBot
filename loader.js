@@ -255,6 +255,7 @@ const CreateDiscordBot = () => {
                     .setThumbnail(config.paradise.gif)
                     .setTitle("Dzień " + kv[0].date.format('DD-MM-YYYY'))
                     .setTimestamp()
+                    .setFooter({ text: "Ostatnia aktualizacja | " })
                     .addFields(fd)
                 )
             }
