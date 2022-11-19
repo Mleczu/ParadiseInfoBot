@@ -64,7 +64,7 @@ class Instance {
         this.createCronJob('30 0 * * * *', this.Ping3DaysLeftWarehouse);
         this.createCronJob('1 * * * * *', this.ProcessQueue);
         this.createCronJob('0 59 23 * * *', this.GenerateDailyReport);
-        this.createCronJob('0 */5 * * * *', this.SendQueueList);
+        this.createCronJob('0 */2 * * * *', this.SendQueueList);
         return this
     }
 
