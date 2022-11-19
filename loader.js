@@ -8,6 +8,7 @@ const logger = require('./logger')
 const { MakeRequest } = require('./functions')
 const { replyEmbed } = require('./prettyReply')
 const db = Database.connect(config.database)
+const moment = require('moment');
 
 const Instance = require('./bot')
 
@@ -188,6 +189,77 @@ const CreateDiscordBot = () => {
         if (!channel) return
         const embed = new Discord.EmbedBuilder().setColor(config.discord.color).setTimestamp().setDescription(message)
         channel.send({embeds: [embed]})
+        } catch(e) {}
+    }
+    bot.SendQueueList = async (group, settings, type) => {
+        try {
+        const query = await db("SELECT discord_id FROM bots WHERE paradise_id = " + group + " LIMIT 1")
+        if (!query || query.length == 0) return;
+        const server = await bot.guilds.fetch(query[0].discord_id)
+        if (!server) return
+        const channelId = settings.autoedit.queues[type].channel
+        if (!channelId || channelId.length == 0) return
+        const channel = await server.channels.fetch(channelId)
+        if (!channel) return
+        let mid = settings.autoedit.queues[type].message
+        if (mid.length == 0) mid = '123123123123' 
+        await channel.messages.fetch(mid).catch(er => {
+            channel.send({ embeds: [new Discord.EmbedBuilder().setDescription("Oczekiwanie na edycje.")] }).then(nm => {
+                let nsettings = settings
+                nsettings.autoedit.queues[type].message = nm.id
+                db("UPDATE bots SET settings = '" + JSON.stringify(nsettings) + "' WHERE paradise_id = " + group + " ORDER BY id DESC LIMIT 1")
+            })
+        })
+        if (!settings.autoedit.queues[type].message || settings.autoedit.queues[type].message.length == 0) return
+        const list = await db("SELECT * FROM queue WHERE gid = " + group + " AND `type` = '" + type + "' AND date > NOW() ORDER BY date ASC")
+        const msg = await channel.messages.fetch(mid)
+        if (!list || list.length == 0) {
+            msg.edit({ embeds: [
+                new Discord.EmbedBuilder()
+                .setColor(config.discord.color)
+                .setThumbnail(config.paradise.gif)
+                .setTitle("Brak dostępnych zapisów")
+                .setTimestamp()
+            ]})
+            return
+        }
+        const dates = list.map(d => { return { date: moment(d.date), user: d.user } } )
+        const sorted = {}
+        for (const d of dates) {
+            if (!sorted[d.date.dayOfYear()]) sorted[d.date.dayOfYear()] = []
+            sorted[d.date.dayOfYear()].push(d)
+        }
+        let embedsOut = []
+        for (const k in sorted) {
+            const e = sorted[k]
+            let chunks = []
+            while (e.length > 0) {
+                chunks.push(e.splice(0, 25))
+            }
+            for (const kv of chunks) {
+                let fd = []
+                for (const f of kv) {
+                    let user
+                    if (f.user != null) user = await bot.paradise.GetUserById(f.user)
+                    fd.push(
+                        {
+                            name: `${f.date.format('DD-MM-YYYY HH:mm')}`,
+                            value: ((f.user != null) ? `${((user) ? user.login : "Nieznany")}` : "---"),
+                            inline: true
+                        }
+                    )
+                }
+                embedsOut.push(
+                    new Discord.EmbedBuilder()
+                    .setColor(config.discord.color)
+                    .setThumbnail(config.paradise.gif)
+                    .setTitle("Dzień " + kv[0].date.format('DD-MM-YYYY'))
+                    .setTimestamp()
+                    .addFields(fd)
+                )
+            }
+        }
+        msg.edit({ embeds: embedsOut })
         } catch(e) {}
     }
     bot.logger = logger

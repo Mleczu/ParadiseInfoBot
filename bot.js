@@ -30,6 +30,7 @@ class Instance {
         this.groupUrl
         this.settings
         this.isEnabled
+        this.queueTypes = ["import", "artifact"]
     }
 
     createCronJob(interval, job) {
@@ -63,6 +64,7 @@ class Instance {
         this.createCronJob('30 0 * * * *', this.Ping3DaysLeftWarehouse);
         this.createCronJob('1 * * * * *', this.ProcessQueue);
         this.createCronJob('0 59 23 * * *', this.GenerateDailyReport);
+        this.createCronJob('0 */5 * * * *', this.SendQueueList);
         return this
     }
 
@@ -447,8 +449,7 @@ class Instance {
     }
 
     async ProcessQueue() {
-        const queueTypes = ["import", "artifact"]
-        for (const type of queueTypes) {
+        for (const type of this.queueTypes) {
             if (!this.settings.queue[type].status) continue
             const now = moment()
             const t = this.settings.queue[type].time
@@ -513,6 +514,12 @@ class Instance {
             { name: "Ilość: Lombard", value: `${pawn}`, inline: true}
         ]
         this.bot.SendActionLog(this.group, "Dzienny Report", "daily_reports", { fields })
+    }
+    
+    async SendQueueList() {
+        for (const type of this.queueTypes) {
+            this.bot.SendQueueList(this.group, this.settings, type)
+        }
     }
 }
 
