@@ -189,15 +189,12 @@ class Instance {
     async GetPaymentModifier(user, type) {
         let rank = await this.GetRank(user.id)
         rank = rank.toLowerCase().replace(/#[A-Za-z0-9]{6}/g, "")
-        let tempSettings = await this.bot.database("SELECT settings FROM bots WHERE paradise_id = " + this.group + " LIMIT 1")
-        if (!tempSettings || tempSettings.length == 0) return { count: 50, percent: true }
-        tempSettings = JSON.parse(tempSettings[0].settings)
-        if (tempSettings.perUserRankSystem) {
+        if (this.settings.perUserRankSystem) {
             rank = rank.split("-")[0].trim()
         } else {
             rank = rank.trim()
         }
-        const table = tempSettings.payouts[type]
+        const table = this.settings.payouts[type]
         if (table[rank]) return table[rank]
         if (table["*"]) return table["*"]
         if (type == "export") return { count: 0, percent: true, instantPayout: false }
