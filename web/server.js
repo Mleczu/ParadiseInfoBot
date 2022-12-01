@@ -339,8 +339,10 @@ app.post('/auth', async (req, res) => {
     }
     const d = data[0]
     req.session.isLoggedIn = true;
+    console.log(req.session.isLoggedIn)
     req.session.username = JSON.parse(d.settings).client.username;
     req.session.account = d
+    console.log(req.session)
     logger.info("Pomyślne logowanie do panelu przez " + (req.headers['x-forwarded-for'] || req.socket.remoteAddress) + " pod nickiem " + req.body.username)
     return res.redirect("/dashboard")
 })
@@ -367,7 +369,7 @@ app.get('/dashboard/exportPrices', (req, res) => {
 
 app.get('/dashboard/members', (req, res) => {
     if (!req.session.isLoggedIn) return res.redirect("/")
-    return res.render("members", { name: req.session.username, account: req.session.account })
+    return res.render("members", { name: req.session.username, account: req.session.account, showOnlyManageable: req.session.showOnlyManageable || true })
 })
 
 app.get('/dashboard/queues', (req, res) => {
