@@ -289,7 +289,9 @@ const app = express()
 app.set('trust proxy', 1)
 app.use(cookieSession({
     name: 'session',
-    keys: ['dhjfauersdacjnxnzjsajkdhsarjqewfhcdsacasnbasjhqewdjsnd']
+    keys: ['dhjfauersdacjnxnzjsajkdhsarjqewfhcdsacasnbasjhqewdjsnd'],
+    maxAge: 24 * 60 * 60 * 1000,
+    secure: false
   }))
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
