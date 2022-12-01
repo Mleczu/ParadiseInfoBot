@@ -340,7 +340,7 @@ app.post('/auth', async (req, res) => {
     const d = data[0]
     req.session.isLoggedIn = true;
     req.session.username = JSON.parse(d.settings).client.username;
-    req.session.account = JSON.parse(d)
+    req.session.account = d
     logger.info("Pomyślne logowanie do panelu przez " + (req.headers['x-forwarded-for'] || req.socket.remoteAddress) + " pod nickiem " + req.body.username)
     return res.redirect("/dashboard")
 })

@@ -6,7 +6,15 @@
         <div class="col-lg-12">
             <div class="card shadow mb-5">
                 <div class="card-header py-3">
-                    <p class="text-primary m-0 fw-bold">Lista członków</p>
+                    <div class="col d-flex">
+                        <p class="text-primary m-0 fw-bold">Lista członków</p>
+                        <div class="col d-flex justify-content-end">
+                            <p class="text-secondary m-0 fw-bold px-3">Pokaż tylko członków dostępnych w panelu</p>
+                            <div class="form-check form-switch">
+                                <input onchange="ToggleQueue('import', this)" {{ (showOnlyManageable) ? 'checked' : '' }} id="queue_import_status" class="form-check-input" type="checkbox" role="switch" />
+                            </div>
+                        </div>
+                    </div>
                 </div>
                 <div class="card-body">
                     <div class="table-responsive table mt-2" id="dataTable" role="grid" aria-describedby="dataTable_info">
