@@ -64,7 +64,7 @@ class Instance {
         this.createCronJob('30 0 * * * *', this.Ping3DaysLeftWarehouse);
         this.createCronJob('1 * * * * *', this.ProcessQueue);
         this.createCronJob('0 59 23 * * *', this.GenerateDailyReport);
-        this.createCronJob('0 40 * * * *', this.GeneratePayoutPreview);
+        this.createCronJob('0 45 * * * *', this.GeneratePayoutPreview);
         this.createCronJob('*/10 * * * * *', this.SendQueueList);
         return this
     }
@@ -516,7 +516,7 @@ class Instance {
 
     async GeneratePayoutPreview() {
         if (!(this.settings.discord.channels.payout_preview && this.settings.discord.channels.payout_preview.length != 0)) return
-        const data = await this.bot.database("SELECT uid, cash FROM users WHERE gid = " + gid.id + " AND cash <> 0 ORDER BY cash DESC LIMIT 25")
+        const data = await this.bot.database("SELECT uid, cash FROM users WHERE gid = " + this.group + " AND cash <> 0 ORDER BY cash DESC LIMIT 25")
         if (!data || data.length == 0) return
         let totalCash = 0
         for (const d of data) {
