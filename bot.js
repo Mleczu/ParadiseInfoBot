@@ -64,7 +64,7 @@ class Instance {
         this.createCronJob('30 0 * * * *', this.Ping3DaysLeftWarehouse);
         this.createCronJob('1 * * * * *', this.ProcessQueue);
         this.createCronJob('0 59 23 * * *', this.GenerateDailyReport);
-        this.createCronJob('0 45 * * * *', this.GeneratePayoutPreview);
+        this.createCronJob('0 48 * * * *', this.GeneratePayoutPreview);
         this.createCronJob('*/10 * * * * *', this.SendQueueList);
         return this
     }
@@ -519,6 +519,7 @@ class Instance {
         const data = await this.bot.database("SELECT uid, cash FROM users WHERE gid = " + this.group + " AND cash <> 0 ORDER BY cash DESC LIMIT 25")
         if (!data || data.length == 0) return
         let totalCash = 0
+        let payoutData = []
         for (const d of data) {
             const user = await this.bot.paradise.GetUserById(d.uid) || { login: "Brak danych" }
             payoutData.push("**" + user.login + "** - " + NumberWithSpaces(d.cash))
