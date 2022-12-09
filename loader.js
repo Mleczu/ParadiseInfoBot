@@ -172,6 +172,9 @@ const CreateDiscordBot = () => {
             case "daily_reports": {
                 embed.setAuthor({ name: author, iconURL: bot.user.displayAvatarURL() }).addFields(data.fields)
             }
+            case "payout_preview": {
+                embed.setAuthor({ name: author, iconURL: bot.user.displayAvatarURL() }).setDescription(data.description).setFooter({text:data.footer})
+            }
         }
         channel.send({embeds: [embed]})
         } catch(e) {}

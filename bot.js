@@ -510,7 +510,20 @@ class Instance {
             { name: "Ilość: Artefakty", value: `${art}`, inline: true},
             { name: "Ilość: Lombard", value: `${pawn}`, inline: true}
         ]
-        this.bot.SendActionLog(this.group, "Dzienny Report", "daily_reports", { fields })
+        this.bot.SendActionLog(this.group, "Raport dzienny", "daily_reports", { fields })
+    }
+
+    async GeneratePayoutPreview() {
+        if (!(this.settings.discord.channels.payout_preview && this.settings.discord.channels.payout_preview.length != 0)) return
+        const data = await this.bot.database("SELECT uid, cash FROM users WHERE gid = " + gid.id + " AND cash <> 0 ORDER BY cash DESC LIMIT 25")
+        if (!data || data.length == 0) return
+        let totalCash = 0
+        for (const d of data) {
+            const user = await this.bot.paradise.GetUserById(d.uid) || { login: "Brak danych" }
+            payoutData.push("**" + user.login + "** - " + NumberWithSpaces(d.cash))
+            totalCash = totalCash + d.cash
+        }
+        this.bot.SendActionLog(this.group, "Podgląd wypłat", "payout_preview", { description: "**Lista wypłat**\n\n" + payoutData.join("\n"), footer: "Łącznie do wypłaty: " + NumberWithSpaces(totalCash) + "$" })
     }
     
     async SendQueueList() {

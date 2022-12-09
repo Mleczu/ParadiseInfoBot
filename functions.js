@@ -234,6 +234,7 @@ const channelMappings = {
     "channelPriceChange": "price_change",
     "channelHotDeals": "hot_deals",
     "channelDailyReports": "daily_reports",
+    "channelPayoutPreview": "payout_preview",
     "news": "channelNews",
     "import_success": "channelImport",
     "import_fail": "channelImportFailed",
@@ -243,7 +244,8 @@ const channelMappings = {
     "pawnshop": "channelPawnshop",
     "price_change": "channelPriceChange",
     "hot_deals": "channelHotDeals",
-    "daily_reports": "channelDailyReports"
+    "daily_reports": "channelDailyReports",
+    "payout_preview": "channelPayoutPreview"
 }
 
 const queueNames = {
