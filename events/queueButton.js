@@ -28,7 +28,7 @@ module.exports = {
                         .setLabel("Wypisz się")
                         .setStyle(Discord.ButtonStyle.Danger),
                     new Discord.ButtonBuilder()
-                        .setURL("https://paradiseinfo.mleczu.tech/queue/" + gid.id + "/" + GetReverseQueueNameMapping(cidData[2]))
+                        .setURL("https://paradiseinfo.mleczu.me/queue/" + gid.id + "/" + GetReverseQueueNameMapping(cidData[2]))
                         .setLabel("Podgląd tabeli")
                         .setStyle(Discord.ButtonStyle.Link),
                 )
