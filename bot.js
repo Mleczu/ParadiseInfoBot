@@ -63,7 +63,7 @@ class Instance {
         this.createCronJob('30 0 * * * *', this.Ping1DayLeftWarehouse);
         this.createCronJob('30 0 * * * *', this.Ping3DaysLeftWarehouse);
         this.createCronJob('1 * * * * *', this.ProcessQueue);
-        this.createCronJob('0 59 23 * * *', this.GenerateDailyReport);
+        this.createCronJob('0 06 17 * * *', this.GenerateDailyReport);
         this.createCronJob('0 59 23 * * *', this.GeneratePayoutPreview);
         this.createCronJob('*/10 * * * * *', this.SendQueueList);
         return this
@@ -481,7 +481,9 @@ class Instance {
     }
 
     async GenerateDailyReport() {
+        console.log(this.group + "  - " + this.settings.discord.channels.daily_reports + " - " + this.settings.discord.channels.daily_reports.length)
         if (!(this.settings.discord.channels.daily_reports && this.settings.discord.channels.daily_reports.length != 0)) return
+        console.log(this.group + " - 1")
         const date = new Date()
         const dateString = [date.getFullYear(), date.getMonth(), date.getDate()].join("-")
         const existCheck = await this.bot.database("SELECT * FROM balance_history WHERE `date` = '" + dateString + "' AND gid = " + this.group + " LIMIT 1")
@@ -501,6 +503,7 @@ class Instance {
             art = existCheck[0].artifact
             pawn = existCheck[0].pawnshop
         }
+        console.log(this.group + " - 2 - " + earnings)
         let fields = [
             { name: "Zarobione pieniądze", value: `${NumberWithSpaces(Math.floor(earnings))}$`, inline: true},
             { name: "Wypłacone pieniądze", value: `${NumberWithSpaces(Math.floor(out))}$`, inline: true},
@@ -511,7 +514,7 @@ class Instance {
             { name: "Ilość: Artefakty", value: `${art}`, inline: true},
             { name: "Ilość: Lombard", value: `${pawn}`, inline: true}
         ]
-        this.bot.SendActionLog(this.group, "Raport dzienny", "daily_reports", { fields })
+        // this.bot.SendActionLog(this.group, "Raport dzienny", "daily_reports", { fields })
     }
 
     async GeneratePayoutPreview() {
