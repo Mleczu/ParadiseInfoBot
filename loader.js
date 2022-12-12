@@ -178,7 +178,7 @@ const CreateDiscordBot = () => {
         }
         channel.send({embeds: [embed]})
         } catch(e) {
-            logger.info("Bład przy wysyłaniu wiadomości typu " + type +  " na kanale " + channelId + " (" + channel.name + ")")
+            logger.info("Bład przy wysyłaniu wiadomości typu " + type + " dla organizacji " + group)
             console.log(error);
         }
     }
