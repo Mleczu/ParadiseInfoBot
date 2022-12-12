@@ -177,7 +177,10 @@ const CreateDiscordBot = () => {
             }
         }
         channel.send({embeds: [embed]})
-        } catch(e) {}
+        } catch(e) {
+            logger.info("Bład przy wysyłaniu wiadomości typu " + type +  " na kanale " + channelId + " (" + channel.name + ")")
+            console.log(error);
+        }
     }
     bot.SendQueueLog = async (group, queue, message) => {
         if (!queue) return
