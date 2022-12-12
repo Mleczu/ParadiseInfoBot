@@ -179,7 +179,7 @@ const CreateDiscordBot = () => {
         channel.send({embeds: [embed]})
         } catch(e) {
             logger.info("Bład przy wysyłaniu wiadomości typu " + type + " dla organizacji " + group)
-            console.log(error);
+            console.log(e);
         }
     }
     bot.SendQueueLog = async (group, queue, message) => {
