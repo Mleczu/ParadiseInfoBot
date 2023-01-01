@@ -157,8 +157,6 @@ class Instance {
         const type = this.GetLogType(log)
         const author = await this.bot.paradise.GetUserByName(log.member_name)
         if (!author) return
-        const isUserIgnored = await this.IsUserIgnored(author)
-        if (isUserIgnored) return;
         let data = [log.log]
         if (logTypes[type]) data = log.log.match(logTypes[type]) 
         await this.LogProcess(author, type, data)
@@ -218,6 +216,8 @@ class Instance {
         const modifier = await this.GetPaymentModifier(user, type)
         count = ((modifier.percent) ? Math.floor((count * (modifier.count / 100))) : modifier.count)
         if (!dontAddHistory) this.AddBalanceHistory(count, "in")
+        const isUserIgnored = await this.IsUserIgnored(user)
+        if (isUserIgnored) return;
         await this.bot.database("UPDATE `users` SET cash = cash + " + count + ", earn_" + type + " = earn_" + type + " + " + count + " WHERE uid = " + user.id + " AND gid = " + this.group + " LIMIT 1")
     }
     
