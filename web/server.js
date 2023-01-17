@@ -337,12 +337,13 @@ app.post('/auth', async (req, res) => {
     if (!data || data.length == 0) {
         req.session.loginCode = 1
         logger.warn("Nieudana próba logowania do panelu przez " + (req.headers['x-forwarded-for'] || req.socket.remoteAddress) + " pod nickiem " + req.body.username)
-        return res.redirect('/login')            
+        return res.redirect('/login')       
     }
     const d = data[0]
     req.session.isLoggedIn = true;
-    req.session.username = JSON.parse(d.settings).client.username;
-    req.session.account = d
+    req.session.username = JSON.parse(d.settings).client.username
+    req.session.paradise_id = d.paradise_id
+    req.session.discord_id = d.discord_id
     logger.info("Pomyślne logowanie do panelu przez " + (req.headers['x-forwarded-for'] || req.socket.remoteAddress) + " pod nickiem " + req.body.username)
     return res.redirect("/dashboard")
 })
@@ -359,7 +360,7 @@ app.get('/dashboard', (req, res) => {
 
 app.get('/dashboard/organisation', (req, res) => {
     if (!req.session.isLoggedIn) return res.redirect("/")
-    return res.render("organisation", { name: req.session.username, account: req.session.account })
+    return res.render("organisation", { name: req.session.username, paradise_id: req.session.paradise_id, discord_id: req.session.discord_id })
 })
 
 app.get('/dashboard/exportPrices', (req, res) => {
@@ -380,7 +381,7 @@ app.get('/dashboard/queues', (req, res) => {
 app.get('/dashboard/profile/:id?', async (req, res) => {
     if (!req.session.isLoggedIn) return res.redirect("/")
     if (!req.params.id || isNaN(req.params.id)) return res.redirect("/dashboard/members")
-    const checkIfOrganisation = await db("SELECT id FROM users WHERE gid = " + req.session.account.paradise_id + " AND uid = " + req.params.id)
+    const checkIfOrganisation = await db("SELECT id FROM users WHERE gid = " + req.session.paradise_id + " AND uid = " + req.params.id)
     if (!checkIfOrganisation || checkIfOrganisation.length == 0) return res.redirect("/dashboard/members")
     return res.render("profile", { name: req.session.username, account: req.session.account, profile: req.params.id })
 })
@@ -415,14 +416,14 @@ app.get('/api/balance/:date?', async (req, res) => {
     let date = new Date(stringDate)
     if (!date || date == "Invalid Date") return res.status(500).json({ message: "Could not parse date" })
     const dateString = [date.getFullYear(), date.getMonth(), date.getDate()].join("-")
-    const data = await db("SELECT * FROM balance_history WHERE gid = " + req.session.account.paradise_id + " AND `date` = '" + dateString + "' ORDER BY id DESC LIMIT 1")
+    const data = await db("SELECT * FROM balance_history WHERE gid = " + req.session.paradise_id + " AND `date` = '" + dateString + "' ORDER BY id DESC LIMIT 1")
     if (!data || data.length == 0) return res.json({})
     return res.json({ in: data[0].in, out: data[0].out })
 })
 
 app.get('/api/channels', async (req, res) => {
     if (!req.session.isLoggedIn) return res.status(403).json({ message: "Brak uprawnień" })
-    const data = await db("SELECT settings FROM bots WHERE paradise_id = " + req.session.account.paradise_id + " ORDER BY id DESC LIMIT 1")
+    const data = await db("SELECT settings FROM bots WHERE paradise_id = " + req.session.paradise_id + " ORDER BY id DESC LIMIT 1")
     if (!data || data.length == 0) return res.json({})
     const c = JSON.parse(data[0].settings).discord.channels
     const re = {}
@@ -437,20 +438,20 @@ app.post('/api/channels', async (req, res) => {
     let values = req.body
     if (!values.data) return res.status(400).json({ message: "Bad request" })
     values = values.data
-    const before = await db("SELECT settings FROM bots WHERE paradise_id = " + req.session.account.paradise_id + " ORDER BY id DESC LIMIT 1")
+    const before = await db("SELECT settings FROM bots WHERE paradise_id = " + req.session.paradise_id + " ORDER BY id DESC LIMIT 1")
     if (!before || before.length == 0) return res.status(500).json({ message: "Server error" })
     const beforeJson = makeRequiredValues(JSON.parse(before[0].settings))
     for (const v of values) {
         beforeJson.discord.channels[GetChannelNameMapping(v.name)] = v.value
     }
-    const data = await db("UPDATE bots SET settings = '" + JSON.stringify(beforeJson) + "' WHERE paradise_id = " + req.session.account.paradise_id + " ORDER BY id DESC LIMIT 1")
+    const data = await db("UPDATE bots SET settings = '" + JSON.stringify(beforeJson) + "' WHERE paradise_id = " + req.session.paradise_id + " ORDER BY id DESC LIMIT 1")
     if (!data || data.length == 0) return res.status(500).json({ message: "Server error" })
     return res.json({ message: "Updated", success: true })
 })
 
 app.get('/api/pings', async (req, res) => {
     if (!req.session.isLoggedIn) return res.status(403).json({ message: "Brak uprawnień" })
-    const data = await db("SELECT settings FROM bots WHERE paradise_id = " + req.session.account.paradise_id + " ORDER BY id DESC LIMIT 1")
+    const data = await db("SELECT settings FROM bots WHERE paradise_id = " + req.session.paradise_id + " ORDER BY id DESC LIMIT 1")
     if (!data || data.length == 0) return res.json({})
     res.json(JSON.parse(data[0].settings).discord.pings || {})
 })
@@ -460,20 +461,20 @@ app.post('/api/pings', async (req, res) => {
     let values = req.body
     if (!values.data) return res.status(400).json({ message: "Bad request" })
     values = values.data
-    const before = await db("SELECT settings FROM bots WHERE paradise_id = " + req.session.account.paradise_id + " ORDER BY id DESC LIMIT 1")
+    const before = await db("SELECT settings FROM bots WHERE paradise_id = " + req.session.paradise_id + " ORDER BY id DESC LIMIT 1")
     if (!before || before.length == 0) return res.status(500).json({ message: "Server error" })
     const beforeJson = makeRequiredValues(JSON.parse(before[0].settings))
     for (const v of values) {
         beforeJson.discord.pings[v.name] = v.value
     }
-    const data = await db("UPDATE bots SET settings = '" + JSON.stringify(beforeJson) + "' WHERE paradise_id = " + req.session.account.paradise_id + " ORDER BY id DESC LIMIT 1")
+    const data = await db("UPDATE bots SET settings = '" + JSON.stringify(beforeJson) + "' WHERE paradise_id = " + req.session.paradise_id + " ORDER BY id DESC LIMIT 1")
     if (!data || data.length == 0) return res.status(500).json({ message: "Server error" })
     return res.json({ message: "Updated", success: true })
 })
 
 app.get('/api/exportPrices', async (req, res) => {
     if (!req.session.isLoggedIn) return res.status(403).json({ message: "Brak uprawnień" })
-    const data = await db("SELECT * FROM export_prices WHERE gid = " + req.session.account.paradise_id + " ORDER BY price DESC")
+    const data = await db("SELECT * FROM export_prices WHERE gid = " + req.session.paradise_id + " ORDER BY price DESC")
     if (!data) return res.json([])
     return res.json(data)
 })
@@ -485,11 +486,11 @@ app.post('/api/exportPrices', async (req, res) => {
     values = values.data
     if (!values.model || !values.price) return res.status(400).json({ message: "Niewystarczające informajce" })
     if (values.price < 1 || values.price > 100000000) return res.status(400).json({ message: "Niepoprawny zakres cen" })
-    const before = await db("SELECT * FROM export_prices WHERE gid = " + req.session.account.paradise_id + " AND model = '" + values.model + "' ORDER BY id DESC LIMIT 1")
+    const before = await db("SELECT * FROM export_prices WHERE gid = " + req.session.paradise_id + " AND model = '" + values.model + "' ORDER BY id DESC LIMIT 1")
     if (!before) return res.status(500).json({ message: "Server error" })
     if (before.length > 0) return res.status(200).json({ message: "Cena tego modelu została już ustalona" })
     if (!Object.values(vehicleMappings).includes(values.model)) return res.json({ message: "Niepoprawny model pojazdu" })
-    const data = await db("INSERT INTO export_prices (`gid`, `model`, `price`) VALUES (" + req.session.account.paradise_id + ", '" + values.model + "', " + values.price + ")")
+    const data = await db("INSERT INTO export_prices (`gid`, `model`, `price`) VALUES (" + req.session.paradise_id + ", '" + values.model + "', " + values.price + ")")
     if (!data) return res.status(500).json({ message: "Server error" })
     return res.json({ message: "Added", success: true })
 })
@@ -500,18 +501,18 @@ app.delete('/api/exportPrices', async (req, res) => {
     if (!values.data) return res.status(400).json({ message: "Bad request" })
     values = values.data
     if (!values.model) return res.status(400).json({ message: "Bad request" })
-    const data = await db("DELETE FROM export_prices WHERE gid = " + req.session.account.paradise_id + " AND model = '" + values.model + "' LIMIT 1")
+    const data = await db("DELETE FROM export_prices WHERE gid = " + req.session.paradise_id + " AND model = '" + values.model + "' LIMIT 1")
     if (!data) return res.status(500).json({ message: "Server error" })
     return res.json({ message: "Updated", success: true })
 })
 
 app.patch('/api/exportPrices', async (req, res) => {
     if (!req.session.isLoggedIn) return res.status(403).json({ message: "Brak uprawnień" })
-    const data = await db("SELECT * FROM export_prices WHERE gid = " + req.session.account.paradise_id + " LIMIT 1")
+    const data = await db("SELECT * FROM export_prices WHERE gid = " + req.session.paradise_id + " LIMIT 1")
     if (!data) return res.status(500).json({ message: "Server error" })
     if (data.length != 0) return res.status(200).json({ message: "Usuń wszystkie pojazdy przed wczytaniem domyślnych ustawień" })
     for (const i in vehiclePrices) {
-        const data = await db("INSERT INTO export_prices (`gid`, `model`, `price`) VALUES (" + req.session.account.paradise_id + ", '" + i + "', " + vehiclePrices[i] + ")")
+        const data = await db("INSERT INTO export_prices (`gid`, `model`, `price`) VALUES (" + req.session.paradise_id + ", '" + i + "', " + vehiclePrices[i] + ")")
         if (!data) return res.status(500).json({ message: "Server error" })
     }
     return res.json({ message: "Loaded", success: true })
@@ -519,7 +520,7 @@ app.patch('/api/exportPrices', async (req, res) => {
 
 app.get('/api/warehouse', async (req, res) => {
     if (!req.session.isLoggedIn) return res.status(403).json({ message: "Brak uprawnień" })
-    const data = await db("SELECT * FROM imports WHERE gid = " + req.session.account.paradise_id + " ORDER BY id ASC")
+    const data = await db("SELECT * FROM imports WHERE gid = " + req.session.paradise_id + " ORDER BY id ASC")
     if (!data) return res.json([])
     return res.json(data)
 })
@@ -530,14 +531,14 @@ app.delete('/api/warehouse', async (req, res) => {
     if (!values.data) return res.status(400).json({ message: "Bad request" })
     values = values.data
     if (!values.id) return res.status(400).json({ message: "Bad request" })
-    const data = await db("DELETE FROM imports WHERE gid = " + req.session.account.paradise_id + " AND id = '" + values.id + "' LIMIT 1")
+    const data = await db("DELETE FROM imports WHERE gid = " + req.session.paradise_id + " AND id = '" + values.id + "' LIMIT 1")
     if (!data) return res.status(500).json({ message: "Server error" })
     return res.json({ message: "Updated", success: true })
 })
 
 app.get('/api/members', async (req, res) => {
     if (!req.session.isLoggedIn) return res.status(403).json({ message: "Brak uprawnień" })
-    const data = await db("SELECT uid,cash FROM users WHERE gid = " + req.session.account.paradise_id + " ORDER BY cash DESC")
+    const data = await db("SELECT uid,cash FROM users WHERE gid = " + req.session.paradise_id + " ORDER BY cash DESC")
     if (!data) return res.json([])
     return res.json(data)
 })
@@ -545,9 +546,9 @@ app.get('/api/members', async (req, res) => {
 app.get('/api/profile/:id?', async (req, res) => {
     if (!req.session.isLoggedIn) return res.status(403).json({ message: "Brak uprawnień" })
     if (!req.params.id || isNaN(req.params.id)) return res.status(400).json({ message: "Invalid data" })
-    const data = await db("SELECT * FROM users WHERE gid = " + req.session.account.paradise_id + " AND uid = " + req.params.id + " ORDER BY cash DESC")
+    const data = await db("SELECT * FROM users WHERE gid = " + req.session.paradise_id + " AND uid = " + req.params.id + " ORDER BY cash DESC")
     let importCount = 0
-    const importData = await db("SELECT COUNT(*) FROM imports WHERE gid = " + req.session.account.paradise_id + " AND uid = " + req.params.id)
+    const importData = await db("SELECT COUNT(*) FROM imports WHERE gid = " + req.session.paradise_id + " AND uid = " + req.params.id)
     if (importData) {
         importCount = (importData.length > 0) ? importData[0]["COUNT(*)"] : 0
     }
@@ -579,7 +580,7 @@ app.post('/api/profile/:id?', async (req, res) => {
     }
     
     if (!operator || !value) return res.status(400).json({ message: "Invalid data"})
-    const data = await db("UPDATE users SET " + operator + " WHERE gid = " + req.session.account.paradise_id + " AND uid = " + req.params.id)
+    const data = await db("UPDATE users SET " + operator + " WHERE gid = " + req.session.paradise_id + " AND uid = " + req.params.id)
     if (!data) return res.status(500).json({ message: "Server error" })
     return res.json({ message: "Updated", success: true })
 })
@@ -587,25 +588,25 @@ app.post('/api/profile/:id?', async (req, res) => {
 app.delete('/api/profile/:id?', async (req, res) => {
     if (!req.session.isLoggedIn) return res.status(403).json({ message: "Brak uprawnień" })
     if (!req.params.id || isNaN(req.params.id)) return res.status(400).json({ message: "Invalid data" })
-    await db("DELETE FROM users WHERE gid = " + req.session.account.paradise_id + " AND uid = " + req.params.id + " LIMIT 1")
-    await db("DELETE FROM imports WHERE gid = " + req.session.account.paradise_id + " AND uid = " + req.params.id + " LIMIT 1")
-    await db("DELETE FROM data_history WHERE gid = " + req.session.account.paradise_id + " AND uid = " + req.params.id + " LIMIT 1")
+    await db("DELETE FROM users WHERE gid = " + req.session.paradise_id + " AND uid = " + req.params.id + " LIMIT 1")
+    await db("DELETE FROM imports WHERE gid = " + req.session.paradise_id + " AND uid = " + req.params.id + " LIMIT 1")
+    await db("DELETE FROM data_history WHERE gid = " + req.session.paradise_id + " AND uid = " + req.params.id + " LIMIT 1")
     return res.json({ message: "Updated", success: true })
 })
 
 app.get('/api/dataHistory/:id?', async (req, res) => {
     if (!req.session.isLoggedIn) return res.status(403).json({ message: "Brak uprawnień" })
     if (!req.params.id || isNaN(req.params.id)) return res.status(400).json({ message: "Invalid data" })
-    const data = await db("SELECT * FROM data_history WHERE gid = " + req.session.account.paradise_id + " AND uid = " + req.params.id + " ORDER BY id DESC LIMIT 672")
+    const data = await db("SELECT * FROM data_history WHERE gid = " + req.session.paradise_id + " AND uid = " + req.params.id + " ORDER BY id DESC LIMIT 672")
     if (!data || data.length == 0) return res.json([])
     return res.json(data.map(d => { return { date: d.date, info: JSON.parse(d.info)} }).reverse())
 })
 
 app.get('/api/queue/data', async (req, res) => {
     if (!req.session.isLoggedIn) return res.status(403).json({ message: "Brak uprawnień" })
-    const data = await db("SELECT settings FROM bots WHERE paradise_id = " + req.session.account.paradise_id + " ORDER BY id DESC LIMIT 1")
+    const data = await db("SELECT settings FROM bots WHERE paradise_id = " + req.session.paradise_id + " ORDER BY id DESC LIMIT 1")
     if (!data || data.length == 0) return res.json({})
-    const data2 = await db("SELECT * FROM queue WHERE gid = " + req.session.account.paradise_id + " AND date > (NOW() - INTERVAL 1 DAY) ORDER BY date ASC")
+    const data2 = await db("SELECT * FROM queue WHERE gid = " + req.session.paradise_id + " AND date > (NOW() - INTERVAL 1 DAY) ORDER BY date ASC")
     if (!data2 || data2.length == 0) return res.json({})
     let result = makeRequiredValues(JSON.parse(data[0].settings)).queue
     for (const d of data2) {
@@ -618,30 +619,30 @@ app.get('/api/queue/data', async (req, res) => {
 app.post('/api/queue/status', async (req, res) => {
     if (!req.session.isLoggedIn) return res.status(403).json({ message: "Brak uprawnień" })
     if (!req.body.data.where) return res.status(400).json({ message: "Bad request" })
-    const data = await db("SELECT settings FROM bots WHERE paradise_id = " + req.session.account.paradise_id)
+    const data = await db("SELECT settings FROM bots WHERE paradise_id = " + req.session.paradise_id)
     if (!data || data.length == 0) return res.json({ message: "Server error" })
     let jsonData = makeRequiredValues(JSON.parse(data[0].settings))
     jsonData.queue[req.body.data.where].status = req.body.data.status
-    await db("UPDATE bots SET settings = '" + JSON.stringify(jsonData) + "' WHERE paradise_id = " + req.session.account.paradise_id + " ORDER BY id DESC LIMIT 1")
+    await db("UPDATE bots SET settings = '" + JSON.stringify(jsonData) + "' WHERE paradise_id = " + req.session.paradise_id + " ORDER BY id DESC LIMIT 1")
     return res.json({ message: "Updated", success: true })
 })
 
 app.post('/api/queue/edit', async (req, res) => {
     if (!req.session.isLoggedIn) return res.status(403).json({ message: "Brak uprawnień" })
     if (!req.body.data.where) return res.status(400).json({ message: "Bad request" })
-    const data = await db("SELECT settings FROM bots WHERE paradise_id = " + req.session.account.paradise_id)
+    const data = await db("SELECT settings FROM bots WHERE paradise_id = " + req.session.paradise_id)
     if (!data || data.length == 0) return res.json({ message: "Server error" })
     let jsonData = makeRequiredValues(JSON.parse(data[0].settings))
     jsonData.queue[req.body.data.where].channel = req.body.data.channel
     jsonData.queue[req.body.data.where].time = req.body.data.time
-    await db("UPDATE bots SET settings = '" + JSON.stringify(jsonData) + "' WHERE paradise_id = " + req.session.account.paradise_id + " ORDER BY id DESC LIMIT 1")
+    await db("UPDATE bots SET settings = '" + JSON.stringify(jsonData) + "' WHERE paradise_id = " + req.session.paradise_id + " ORDER BY id DESC LIMIT 1")
     return res.json({ message: "Updated", success: true })
 })
 
 app.post('/api/queue/delete', async (req, res) => {
     if (!req.session.isLoggedIn) return res.status(403).json({ message: "Brak uprawnień" })
     if (!req.body.data.where || !req.body.data.date) return res.status(400).json({ message: "Bad request" })
-    await db("UPDATE queue SET user = NULL WHERE `gid` = " + req.session.account.paradise_id + " AND `type` = '" + req.body.data.where + "' AND `date` = '" + req.body.data.date + "' LIMIT 1")
+    await db("UPDATE queue SET user = NULL WHERE `gid` = " + req.session.paradise_id + " AND `type` = '" + req.body.data.where + "' AND `date` = '" + req.body.data.date + "' LIMIT 1")
     return res.json({ message: "Updated", success: true })
 })
 
@@ -654,7 +655,7 @@ app.get('/api/paradise/:id', async (req, res) => {
 
 app.get('/api/discordList', async (req, res) => {
     if (!req.session.isLoggedIn) return res.status(403).json({ message: "Brak uprawnień" })
-    const query = await db("SELECT discord_id, settings FROM bots WHERE paradise_id = " + req.session.account.paradise_id + " LIMIT 1")
+    const query = await db("SELECT discord_id, settings FROM bots WHERE paradise_id = " + req.session.paradise_id + " LIMIT 1")
     if (!query || query.length == 0) return res.json({data: { channels: [], roles: [] }})
     const server = await bot.guilds.fetch(query[0].discord_id)
     if (!server) return res.json({data: { channels: [], roles: [] }})
