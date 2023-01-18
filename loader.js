@@ -299,7 +299,7 @@ const CreateDiscordBot = () => {
 const Load = async (first) => {
     if (first) await CreateDiscordBot()
     logger.info("Ładowanie botów...")
-    const data = await db("SELECT * FROM bots WHERE paid > NOW() AND enabled = 1 AND paradise_id = 1154")
+    const data = await db("SELECT * FROM bots WHERE paid > NOW() AND enabled = 1")
     for (const d of data) {
         if (bots.map(b => b.data.id).includes(d.id)) continue;
         const instance = await new Instance().Create(d, bot)
