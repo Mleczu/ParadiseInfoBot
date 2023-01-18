@@ -289,7 +289,7 @@ const app = express()
 app.set('trust proxy', 1)
 app.use(cookieSession({
     name: 'paradiseinfosession',
-    keys: ['graslwqfkmefdaj3qwdjqdjsjejjjcejfeqwjfsnxnxxnxnSAHDHDWscscax'],
+    keys: ['graslwqfkmefdaj3qwdjqdjsjejjjcejfeqwjfsnxnxgddhjn'],
     maxAge: 24 * 60 * 60 * 1000,
     secure: false
   }))
