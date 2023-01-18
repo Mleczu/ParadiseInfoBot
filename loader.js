@@ -299,61 +299,61 @@ const CreateDiscordBot = () => {
 const Load = async (first) => {
     if (first) await CreateDiscordBot()
     logger.info("Ładowanie botów...")
-    // const data = await db("SELECT * FROM bots WHERE paid > NOW() AND enabled = 1 AND paradise_id = 1154")
-    // for (const d of data) {
-        // if (bots.map(b => b.data.id).includes(d.id)) continue;
-        // const instance = await new Instance().Create(d, bot)
-        // bots.push(instance)
-    // }
+    const data = await db("SELECT * FROM bots WHERE paid > NOW() AND enabled = 1 AND paradise_id = 1154")
+    for (const d of data) {
+        if (bots.map(b => b.data.id).includes(d.id)) continue;
+        const instance = await new Instance().Create(d, bot)
+        bots.push(instance)
+    }
     if (first) {
         require('./web/server').init(bot)
-        // const dataHistoryJob = new cron('0,30 * * * *', async () => {
-        //     const data = await db("SELECT users.* FROM users INNER JOIN bots ON users.gid = bots.paradise_id WHERE bots.enabled = 1")
-        //     if (!data || data.length == 0) return;
-        //     for (const d of data) {
-        //         const jsonData = {
-        //             cash: d.cash,
-        //             count: {
-        //                 artifact: d.count_artifact,
-        //                 import: d.count_import,
-        //                 import_fail: d.count_importfail,
-        //                 export: d.count_export,
-        //                 pawnshop: d.count_pawnshop
-        //             },
-        //             earn: {
-        //                 artifact: d.earn_artifact,
-        //                 import: d.earn_import,
-        //                 export: d.earn_export,
-        //                 pawnshop: d.earn_pawnshop
-        //             }
-        //         }
-        //         db("INSERT INTO data_history (`gid`, `uid`, `info`) VALUES (" + d.gid + ", " + d.uid + ", '" + JSON.stringify(jsonData) + "')")
-        //     }
-        // })
-        // dataHistoryJob.start()
-        // const scanNotPaidJob = new cron('* * * * *', async () => {
-        //     const data = await db("SELECT * FROM bots WHERE paid < NOW() AND enabled = 1")
-        //     if (!data || data.length == 0) return;
-        //     for (const d of data) {
-        //         const b = bots.filter(c => c.group == d.paradise_id)
-        //         if (b.length == 0) continue;
-        //         b[0].DestroyIntervals()
-        //         delete b[0]
-        //         bots = bots.filter(c => c.group != d.paradise_id)
-        //     }
-        // })
-        // scanNotPaidJob.start()
-        // const scanPaidJob = new cron('* * * * *', async () => {
-        //     const data = await db("SELECT * FROM bots WHERE paid > NOW() AND enabled = 1")
-        //     if (!data || data.length == 0) return;
-        //     for (const d of data) {
-        //         const b = bots.filter(c => c.group == d.paradise_id)
-        //         if (b.length !== 0) continue;
-        //         const instance = await new Instance().Create(d, bot)
-        //         bots.push(instance)
-        //     }
-        // })
-        // scanPaidJob.start()
+        const dataHistoryJob = new cron('0,30 * * * *', async () => {
+            const data = await db("SELECT users.* FROM users INNER JOIN bots ON users.gid = bots.paradise_id WHERE bots.enabled = 1")
+             if (!data || data.length == 0) return;
+             for (const d of data) {
+                 const jsonData = {
+                     cash: d.cash,
+                    count: {
+                         artifact: d.count_artifact,
+                        import: d.count_import,
+                        import_fail: d.count_importfail,
+                         export: d.count_export,
+                         pawnshop: d.count_pawnshop
+                     },
+                    earn: {
+                         artifact: d.earn_artifact,
+                        import: d.earn_import,
+                         export: d.earn_export,
+                        pawnshop: d.earn_pawnshop
+                     }
+                }
+                db("INSERT INTO data_history (`gid`, `uid`, `info`) VALUES (" + d.gid + ", " + d.uid + ", '" + JSON.stringify(jsonData) + "')")
+             }
+         })
+        dataHistoryJob.start()
+        const scanNotPaidJob = new cron('* * * * *', async () => {
+            const data = await db("SELECT * FROM bots WHERE paid < NOW() AND enabled = 1")
+            if (!data || data.length == 0) return;
+           for (const d of data) {
+                const b = bots.filter(c => c.group == d.paradise_id)
+                 if (b.length == 0) continue;
+                b[0].DestroyIntervals()
+                delete b[0]
+                bots = bots.filter(c => c.group != d.paradise_id)
+            }
+         })
+         scanNotPaidJob.start()
+        const scanPaidJob = new cron('* * * * *', async () => {
+             const data = await db("SELECT * FROM bots WHERE paid > NOW() AND enabled = 1")
+             if (!data || data.length == 0) return;
+             for (const d of data) {
+                const b = bots.filter(c => c.group == d.paradise_id)
+                if (b.length !== 0) continue;
+               const instance = await new Instance().Create(d, bot)
+                 bots.push(instance)
+             }
+         })
+        scanNotPaidJob.start()
     }
 }
 
