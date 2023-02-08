@@ -93,6 +93,8 @@ class Instance {
     }
 
     async Login() {
+        console.log(this.groupUrl)
+        console.log(this.settings.client)
         let body = {
             login: this.settings.client.username,
             password: this.settings.client.password,
