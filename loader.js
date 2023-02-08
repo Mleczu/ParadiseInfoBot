@@ -302,8 +302,10 @@ const Load = async (first) => {
     const data = await db("SELECT * FROM bots WHERE paid > NOW() AND enabled = 1")
     for (const d of data) {
         if (bots.map(b => b.data.id).includes(d.id)) continue;
+        console.log(d.id)
         const instance = await new Instance().Create(d, bot)
         bots.push(instance)
+        console.log("--------")
     }
     if (first) {
         require('./web/server').init(bot)
