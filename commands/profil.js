@@ -24,7 +24,7 @@ module.exports = {
         const profileCheck = await CheckIfUserHasProfile(bot, gid.id, userCache)
         if (!profileCheck) await CreateUserProfile(bot, gid.id, userCache)
         const data = {
-            general: await bot.database("SELECT cash, count_import, count_artifact FROM users WHERE gid = " + gid.id + " AND uid = " + userCache.id + " LIMIT 1"),
+            general: await bot.database("SELECT cash, count_import, count_artifact, points FROM users WHERE gid = " + gid.id + " AND uid = " + userCache.id + " LIMIT 1"),
             imports: await bot.database("SELECT COUNT(vehicle) FROM imports WHERE gid = " + gid.id + " AND uid = " + userCache.id)
         }
 
@@ -32,11 +32,13 @@ module.exports = {
         const imports = data.general[0].count_import || 0
         const waiting = data.imports[0]["COUNT(vehicle)"] || 0
         const artifacts = data.general[0].count_artifact || 0
+        const points = data.general[0].points || 0
         const fields = [
             { name: "**Pieniądze do wypłaty**", value: `${NumberWithSpaces(payout)}$`},
             { name: "**Pojazdy w magazynie**", value: `${waiting}`, inline: true},
             { name: "**Łączna ilość importów**", value: `${imports}`, inline: true},
-            { name: "**Łączna ilość artefaktów**", value: `${artifacts}`, inline: true}
+            { name: "**Łączna ilość artefaktów**", value: `${artifacts}`, inline: true},
+            { name: "**Punkty**", value: `${points}`, inline: true}
         ]
         return interaction.reply({ embeds: [bot.prettyReply(((member == interaction.member) ? "**Twój profil**" : "**Profil " + memberName + "**"), interaction).addFields(fields).setAuthor({ name: member.displayName, iconURL: member.user.displayAvatarURL({ format: 'png' })})] })
     },
