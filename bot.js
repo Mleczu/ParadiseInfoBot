@@ -189,7 +189,7 @@ class Instance {
         let rank = await this.GetRank(user.id)
         rank = rank.toLowerCase().replace(/#[A-Za-z0-9]{6}/g, "")
         if (this.settings.perUserRankSystem) {
-            rank = rank.split("-")[0].trim()
+            rank = rank.split(" - ")[0].trim()
         } else {
             rank = rank.trim()
         }
