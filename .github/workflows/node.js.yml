@@ -21,7 +21,7 @@ jobs:
       with:
         host: ${{ secrets.VPS_IP }}
         username: ${{ secrets.VPS_USER }}
-        key: ${{ secrets.VPS_KEY }}
+        password: ${{ secrets.VPS_PASSWORD }}
         port: 22
         script: |
           cd /apps/github/ParadiseInfoBot
