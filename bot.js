@@ -52,10 +52,12 @@ class Instance {
         this.isEnabled = true
         this.paid = this.data.paid
         await this.Login()
+        await this.VerifyPermissions()
         this.ProcessQueue()
         this.createInterval(this.Login, 2 * 60 * 60 * 1000)
         this.createInterval(this.PublishInformation, 30 * 1000)
-        this.createCronJob('0 */2 * * * *', this.ProcessLogs)
+        this.createCronJob('0 * * * * *', this.VerifyPermissions)
+        this.createCronJob('0 * * * * *', this.ProcessLogs)
         this.createCronJob('0 1 * * * *', this.LogWarehousePrices);
         this.createCronJob('0 * * * * *', this.UpdateSettings);
         this.createCronJob('30 0 * * * *', this.Ping1DayLeft);
@@ -98,9 +100,29 @@ class Instance {
             password: this.settings.client.password,
             code: ""
         }
-        let result = await MakeRequest("", "https://ucp.paradise-rpg.pl/api/login", false, body)
+        let result = await MakeRequest(false, "https://ucp.paradise-rpg.pl/api/login", body)
+        if (result.error) {
+            logger.warn('Nie udało się zalogować do konta bota ' + this.settings.client.username + ' (' + this.group + ')')
+            this.bot.DestroyBot(this.group)
+            return
+        }
+        console.log(result)
         this.token = result.token
         logger.info('Zalogowano jako ' + JSON.parse(result.user).login)
+    }
+
+    async VerifyPermissions() {
+        const data = await MakeRequest(this.token, this.groupUrl)
+        if (data && data.permissions) {
+            let warehouse = false
+            let logs = false
+            if (data.permissions.warehouse) warehouse = true
+            if (data.permissions.leader) logs = true
+            if (!warehouse || !logs) {
+                logger.warn("Niewystarczająca ranga w grupie " + this.group + " (Logi: " + ((logs) ? "TAK" : "NIE") + ", Magazyn: " + ((warehouse) ? "TAK" : "NIE") + ")")
+                this.bot.DestroyBot(this.group)
+            }
+        }
     }
     
     async CheckIfLogWasProcessed(id) {
@@ -123,13 +145,17 @@ class Instance {
             dateFrom: new Date(Date.now() - (24 * 60 * 60 * 1000)).toISOString(),
             dateTo: new Date().toISOString()
         }
-        let result = await MakeRequest(this.token, this.groupUrl + "/logs", true, body)
+        let result = await MakeRequest(this.token, this.groupUrl + "/logs", body)
         return result
     }
 
     async ProcessLogs() {
         const data = await this.GetLogs();
-        if (data.error) return logger.warn("Prawdopodobnie niewystarczająca ranga w grupie " + this.group)
+        if (data.error) {
+            this.bot.DestroyBot(this.group)
+            logger.warn("Niewystarczająca ranga w grupie " + this.group)
+            return
+        }
         for (const log of data) {
             const checkStatus = await this.CheckIfLogWasProcessed(log.id)
             if (!checkStatus) {
@@ -178,7 +204,7 @@ class Instance {
     }
     
     async GetRank(id) {
-        const userList = await MakeRequest(this.token, "https://ucp.paradise-rpg.pl/api/group/" + this.group, true)
+        const userList = await MakeRequest(this.token, "https://ucp.paradise-rpg.pl/api/group/" + this.group)
         if (!userList) return "Not found"
         const user = userList.group.members.filter(u => u.account.id == id)[0] || { rank: "Not found"}
         let rank = user.rank
@@ -315,7 +341,7 @@ class Instance {
     async CheckWarehouse() {
         const dbData = await this.bot.database("SELECT * FROM imports WHERE gid = " + this.group + " ORDER BY id DESC")
         if (!dbData || dbData.length == 0) return;
-        const data = await MakeRequest(this.token, this.groupUrl + "/warehouses", true)
+        const data = await MakeRequest(this.token, this.groupUrl + "/warehouses")
         if (!data || !data.warehouse) return
         if (!data.warehouse.warehouse) return
         const vehicles = data.warehouse.warehouse.vehicles
@@ -333,7 +359,7 @@ class Instance {
     async LogWarehousePrices() {
         if (!this.settings.discord.channels.price_change && !this.settings.discord.channels.hot_deals) return;
         if (this.settings.discord.channels.price_change.length == 0 && this.settings.discord.channels.hot_deals.length == 0) return;
-        const data = await MakeRequest(this.token, this.groupUrl + "/warehouses", true)
+        const data = await MakeRequest(this.token, this.groupUrl + "/warehouses")
         if (!data || !data.warehouse) return
         if (!data.warehouse.warehouse) return
         const vehicles = data.warehouse.warehouse.vehicles
@@ -418,7 +444,7 @@ class Instance {
 
     async Ping1DayLeftWarehouse() {
         if (!this.settings.discord.pings.switchPing1DayLeftWarehouse) return
-        const data = await MakeRequest(this.token, this.groupUrl + "/warehouses", true)
+        const data = await MakeRequest(this.token, this.groupUrl + "/warehouses")
         if (!data || !data.warehouse) return
         let pingDay = moment((data.warehouse.expires * 1000)).minute(0).seconds(0).milliseconds(0)
         const paidDay = pingDay.dayOfYear()
@@ -433,7 +459,7 @@ class Instance {
 
     async Ping3DaysLeftWarehouse() {
         if (!this.settings.discord.pings.switchPing3DaysLeftWarehouse) return
-        const data = await MakeRequest(this.token, this.groupUrl + "/warehouses", true)
+        const data = await MakeRequest(this.token, this.groupUrl + "/warehouses")
         if (!data || !data.warehouse) return
         let pingDay = moment((data.warehouse.expires * 1000)).minute(0).seconds(0).milliseconds(0)
         const paidDay = pingDay.dayOfYear()

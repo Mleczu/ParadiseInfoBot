@@ -67,8 +67,7 @@ const CreateDiscordBot = () => {
     bot.paradise.cache = []
     bot.paradise.GetUserByName = async (name) => {
         if (bot.paradise.cache.filter(m => m.ttl > Date.now()).map(m => m.login).includes(name)) return bot.paradise.cache.filter(m => m.ttl > Date.now() && m.login == name)[0]
-        // if (!(new RegExp(/^[^ĄąĆćĘęŁłŃńÓóŚśŹźŻż]+$/).test(name))) return;
-        const data = await MakeRequest("", "https://ucp.paradise-rpg.pl/api/search?login=" + name, false)
+        const data = await MakeRequest(false, "https://ucp.paradise-rpg.pl/api/search?login=" + name)
         if (!data || data.length == 0) return;
         let user = data.filter(d => d.login.toLowerCase() == name.toLowerCase())
         if (user.length == 0) return
@@ -79,7 +78,7 @@ const CreateDiscordBot = () => {
     }
     bot.paradise.GetUserById = async (id) => {
         if (bot.paradise.cache.filter(m => m.ttl > Date.now()).map(m => m.id).includes(id)) return bot.paradise.cache.filter(m => m.ttl > Date.now() && m.id == id)[0]
-        const data = await MakeRequest("", "https://ucp.paradise-rpg.pl/api/profile/" + id, false)
+        const data = await MakeRequest(false, "https://ucp.paradise-rpg.pl/api/profile/" + id)
         if (!data || data.length == 0) return;
         let user = {
             id: data.account.id,
@@ -198,6 +197,14 @@ const CreateDiscordBot = () => {
         const embed = new Discord.EmbedBuilder().setColor(config.discord.color).setTimestamp().setDescription(message)
         channel.send({embeds: [embed]})
         } catch(e) {}
+    }
+    bot.DestroyBot = async (id) => {
+        const b = bots.filter(c => c.group == id)
+        if (b.length == 0) return false;
+        b[0].DestroyIntervals()
+        delete b[0]
+        bots = bots.filter(c => c.group != id)
+        return true
     }
     bot.SendQueueList = async (group, settings, type) => {
         try {
@@ -334,26 +341,26 @@ const Load = async (first) => {
         const scanNotPaidJob = new cron('* * * * *', async () => {
             const data = await db("SELECT * FROM bots WHERE paid < NOW() AND enabled = 1")
             if (!data || data.length == 0) return;
-           for (const d of data) {
+            for (const d of data) {
                 const b = bots.filter(c => c.group == d.paradise_id)
-                 if (b.length == 0) continue;
+                if (b.length == 0) continue;
                 b[0].DestroyIntervals()
                 delete b[0]
                 bots = bots.filter(c => c.group != d.paradise_id)
             }
-         })
-         scanNotPaidJob.start()
-        const scanPaidJob = new cron('* * * * *', async () => {
-             const data = await db("SELECT * FROM bots WHERE paid > NOW() AND enabled = 1")
-             if (!data || data.length == 0) return;
-             for (const d of data) {
-                const b = bots.filter(c => c.group == d.paradise_id)
-                if (b.length !== 0) continue;
-               const instance = await new Instance().Create(d, bot)
-                 bots.push(instance)
-             }
-         })
+        })
         scanNotPaidJob.start()
+        const scanPaidJob = new cron('* * * * *', async () => {
+            const data = await db("SELECT * FROM bots WHERE paid > NOW() AND enabled = 1")
+            if (!data || data.length == 0) return;
+            for (const d of data) {
+            const b = bots.filter(c => c.group == d.paradise_id)
+            if (b.length !== 0) continue;
+            const instance = await new Instance().Create(d, bot)
+                bots.push(instance)
+            }
+        })
+        scanPaidJob.start()
     }
 }
 
