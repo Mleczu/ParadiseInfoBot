@@ -8,7 +8,9 @@ module.exports = {
         const command = bot.commands.get(interaction.commandName);
         if (!command) return;
         try {
-            // if (!(new RegExp(/^[^ĄąĆćĘęŁłŃńÓóŚśŹźŻż]+$/).test(interaction.user.tag))) return interaction.reply({ embeds: [bot.prettyReply('Twój nick zawiera polskie znaki. Usuń je przed użyciem komendy!', interaction)], ephemeral: true});
+            let displayName = interaction.user.username
+            if (interaction.member) displayName = interaction.member.displayName
+            if (ContainsPolishChars(displayName)) return interaction.reply({ embeds: [bot.prettyReply('Twój nick zawiera polskie znaki. Usuń je przed użyciem komendy!', interaction)], ephemeral: true});
             bot.logger.info("Wykonanie komendy " + interaction.commandName + " przez " + interaction.user.tag)
             await command.execute(bot, interaction);
         } catch (error) {
