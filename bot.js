@@ -106,7 +106,6 @@ class Instance {
             this.bot.DestroyBot(this.group)
             return
         }
-        console.log(result)
         this.token = result.token
         logger.info('Zalogowano jako ' + JSON.parse(result.user).login)
     }
