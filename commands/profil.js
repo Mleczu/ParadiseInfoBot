@@ -1,5 +1,4 @@
 const Discord = require('discord.js');
-const { ContainsPolishChars } = require('../functions')
 const { CheckIfUserHasProfile, CreateUserProfile, NumberWithSpaces } = require('../functions')
 
 module.exports = {

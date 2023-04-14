@@ -1,4 +1,5 @@
 const Discord = require('discord.js')
+const { ContainsPolishChars } = require('../functions')
 
 module.exports = {
     name: 'interactionCreate',
