@@ -150,6 +150,7 @@ class Instance {
 
     async ProcessLogs() {
         const data = await this.GetLogs();
+        if (!data) return
         for (const log of data) {
             const checkStatus = await this.CheckIfLogWasProcessed(log.id)
             if (!checkStatus) {
