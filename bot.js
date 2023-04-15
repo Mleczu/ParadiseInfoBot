@@ -201,7 +201,7 @@ class Instance {
     async GetRank(id) {
         const userList = await MakeRequest(this.token, "https://ucp.paradise-rpg.pl/api/group/" + this.group)
         if (!userList) return "Not found"
-        const user = userList.group.members.filter(u => u.account.id == id) || [{ rank: "Not found"}]
+        const user = userList.group.members.filter(u => u.account && u.account.id == id) || [{ rank: "Not found"}]
         let rank = user[0].rank
         return rank
     }

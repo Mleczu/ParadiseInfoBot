@@ -7,7 +7,7 @@ module.exports = {
     once: false,
     async execute(bot, interaction) {
         if (interaction.type != Discord.InteractionType.MessageComponent) return;
-        if (interaction.componentType != Discord.ComponentType.SelectMenu) return;
+        if (interaction.componentType != Discord.ComponentType.StringSelect) return;
         const cid = interaction.customId
         const cidData = cid.split('_')
         if (cidData[0] != "queue") return;

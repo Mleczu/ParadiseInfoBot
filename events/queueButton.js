@@ -66,7 +66,7 @@ module.exports = {
                         }
                     }
                     r.addComponents(
-                        new Discord.SelectMenuBuilder()
+                        new Discord.StringSelectMenuBuilder()
                             .setCustomId('queue_submitregister_' + cidData[2] + "_" + k)
                             .setPlaceholder('Wybierz godzine (Dzień: ' + d[0].format('YYYY-MM-DD') + ")")
                             .addOptions(...o),
@@ -108,7 +108,7 @@ module.exports = {
                         })
                     }
                     r.addComponents(
-                        new Discord.SelectMenuBuilder()
+                        new Discord.StringSelectMenuBuilder()
                             .setCustomId('queue_submitunregister_' + cidData[2] + "_" + k)
                             .setPlaceholder('Wybierz godzine (Dzień: ' + d[0].format('YYYY-MM-DD') + ")")
                             .addOptions(...o),
