@@ -139,7 +139,7 @@ class Instance {
     }
     
     async GetLogs() {
-        if (!this.token) return logger.warn("Token not found")
+        if (!this.token) return
         let body = {
             dateFrom: new Date(Date.now() - (24 * 60 * 60 * 1000)).toISOString(),
             dateTo: new Date().toISOString()
@@ -150,11 +150,6 @@ class Instance {
 
     async ProcessLogs() {
         const data = await this.GetLogs();
-        if (data.error) {
-            this.bot.DestroyBot(this.group)
-            logger.warn("Niewystarczająca ranga w grupie " + this.group)
-            return
-        }
         for (const log of data) {
             const checkStatus = await this.CheckIfLogWasProcessed(log.id)
             if (!checkStatus) {
