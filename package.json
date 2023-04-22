@@ -2,11 +2,32 @@
   "name": "paradiseinfobot",
   "version": "1.0.0",
   "description": "",
-  "main": "loader.js",
+  "main": "start.js",
   "scripts": {
     "migration": "node ./database/migration",
-    "start": "node ./loader",
-    "dev": "nodemon ./loader"
+    "start": "node ./start",
+    "dev": "nodemon ./loader",
+    "build": "pkg -t node16-linux,node16-win . --output ./builds/bot"
+  },
+  "bin": {
+    "bot": "./start.js"
+  },
+  "pkg": {
+    "assets": [
+      "./commands/**/*",
+      "./database/**/*",
+      "./events/**/*",
+      "./node_modules/**/*",
+      "./web/**/*",
+      "./.env",
+      "./bot.js",
+      "./config.js",
+      "./deploy.js",
+      "./functions.js",
+      "./loader.js",
+      "./logger.js",
+      "./prettyReply.js"
+    ]
   },
   "keywords": [],
   "author": "",
@@ -15,6 +36,7 @@
     "@discordjs/rest": "^1.0.0",
     "axios": "^0.27.2",
     "bluebird": "^3.7.2",
+    "child_process": "^1.0.2",
     "colors": "^1.4.0",
     "cookie-session": "^2.0.0",
     "cron": "^2.1.0",

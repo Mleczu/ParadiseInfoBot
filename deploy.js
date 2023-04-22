@@ -18,4 +18,4 @@ for (const file of commandFiles) {
 const rest = new REST({ version: '10' }).setToken(config.discord.token);
 rest.put(Routes.applicationCommands(config.discord.clientId), { body: commands })
 	.then(() => logger.info('Pomyślnie zarejestrowano komendy.'))
-	.catch(logger.error);
+	.catch((e) => logger.error("Błąd podczas rejestrowania komend: " + e));

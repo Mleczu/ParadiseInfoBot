@@ -19,11 +19,11 @@ const info = function(message) {
 }
 
 const warn = function(message) {
-    console.warn(formatDate(new Date()) + ' [WARN] '.warn + message.brightYellow)
+    console.log(formatDate(new Date()) + ' [WARN] '.warn + message.brightYellow)
 }
 
 const error = function(message) {
-    console.error(formatDate(new Date()) + ' [ERROR] '.error + message.toString().brightRed)
+    console.log(formatDate(new Date()) + ' [ERROR] '.error + message.toString().brightRed)
 }
 
 module.exports = { info, warn, error }
