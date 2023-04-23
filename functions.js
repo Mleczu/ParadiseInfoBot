@@ -172,4 +172,5 @@ const ContainsPolishChars = (name) => {
     return polishCharsRegex.test(name);
 }
 
+
 module.exports = { MakeRequest, CheckIfUserHasProfile, CreateUserProfile, NumberWithSpaces, GetWarehouseNameMapping, GetWarehousePriceMapping, makeRequiredValues, GetChannelNameMapping, GetQueueNameMapping, GetReverseQueueNameMapping, GetMaxImportPrice, ContainsPolishChars }

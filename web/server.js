@@ -11,7 +11,9 @@ const sha256 = require("crypto-js/sha256");
 const moment = require('moment')
 const Discord = require('discord.js')
 
-const { GetChannelNameMapping, makeRequiredValues } = require('../functions')
+
+const { GetChannelNameMapping, makeRequiredValues } = require('../functions');
+const { error } = require('console');
 
 let bot
 
@@ -378,37 +380,25 @@ app.get('/dashboard/queues', (req, res) => {
     return res.render("queueList", { name: req.session.username, account: req.session.account, hoursSet })
 })
 
-app.get('/dashboard/profile/:id?', async (req, res) => {
-    if (!req.session.isLoggedIn) return res.redirect("/")
-    if (!req.params.id || isNaN(req.params.id)) return res.redirect("/dashboard/members")
-    const checkIfOrganisation = await db("SELECT id FROM users WHERE gid = " + req.session.paradise_id + " AND uid = " + req.params.id)
-    if (!checkIfOrganisation || checkIfOrganisation.length == 0) return res.redirect("/dashboard/members")
-    return res.render("profile", { name: req.session.username, account: req.session.account, profile: req.params.id })
-})
-
-app.get('/queue/:id/:type', async (req, res) => {
-    const types = ["artifact", "import"]
-    if (!types.includes(req.params.type) || !req.params.id || isNaN(req.params.id)) return res.redirect("/")
-    const data = await db("SELECT * FROM queue WHERE gid = " + req.params.id + " AND date > (NOW() - INTERVAL 1 DAY) AND type = '" + req.params.type + "' ORDER BY date ASC")
-    if (!data) return res.redirect("/")
-    let resdata = ""
-    for (const d of data) {
-        let u = { login: "---" }
-        if (d.user) {
-            u = await bot.paradise.GetUserById(d.user)
-        }
-        resdata += "<tr><th>" + moment(d.date).format('DD-MM-YYYY') + "</th><th>" + moment(d.date).format('HH:mm') + "</th><td>" + u.login + "</td></tr>"
+// percent 
+app.get('/dashboard/percentages', async (req, res) => {
+    if (!req.session.isLoggedIn) {
+      return res.redirect("/");
     }
-    return res.render("queue", { data: resdata })
-})
-
-app.get('/api/gethash/:pass', async (req, res) => {
-    if (!req.session.isLoggedIn) return res.status(403).json({ message: "Brak uprawnień" })
-    const pass = req.params.pass
-    if (!pass) return res.status(400).json({ message: "Pass parameter not found" })
-    return res.json({ pass, hash: sha256(escape(pass)).toString() })
-})
-
+    try {
+        const result = await db(`SELECT settings FROM bots WHERE web_name = ${escape(req.session.username)}`);
+        if (!result || !result.length || !result[0].settings) {
+          return res.status(404).send('Nie znaleziono twojego profilu użytkownika, zgłoś się do właściciela bota');
+        }
+        const settings = JSON.parse(result[0].settings);
+        const payouts = settings.payouts;
+        console.log('HERE:', payouts)
+        return res.render("percentages", { name: req.session.username, account: req.session.account, payouts });
+      } catch (error) {
+        return res.status(500).send('Nie znaleziono twojego profilu użytkownika, zgłoś się do właściciela bota');
+      }
+  });
+  
 app.get('/api/balance/:date?', async (req, res) => {
     if (!req.session.isLoggedIn) return res.status(403).json({ message: "Brak uprawnień" })
     const stringDate = req.params.date
