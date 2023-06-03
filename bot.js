@@ -59,7 +59,7 @@ class Instance {
         this.createCronJob('0 * * * * *', this.VerifyPermissions)
         this.createCronJob('0 * * * * *', this.ProcessLogs)
         this.createCronJob('0 1,31 * * * *', this.LogWarehousePrices);
-        this.createCronJob('0 16,46 18,19,20,21 0,6 * *', this.LogWarehousePrices)
+        this.createCronJob('0 16,46 18,19,20,21 6,7 * *', this.LogWarehousePrices)
         this.createCronJob('0 * * * * *', this.UpdateSettings);
         this.createCronJob('30 0 * * * *', this.Ping1DayLeft);
         this.createCronJob('30 0 * * * *', this.Ping3DaysLeft);
