@@ -58,7 +58,8 @@ class Instance {
         this.createInterval(this.PublishInformation, 30 * 1000)
         this.createCronJob('0 * * * * *', this.VerifyPermissions)
         this.createCronJob('0 * * * * *', this.ProcessLogs)
-        this.createCronJob('0 1 * * * *', this.LogWarehousePrices);
+        this.createCronJob('0 1,31 * * * *', this.LogWarehousePrices);
+        this.createCronJob('0 16,46 18,19,20,21 ? * SUN,SAT *', this.LogWarehousePrices)
         this.createCronJob('0 * * * * *', this.UpdateSettings);
         this.createCronJob('30 0 * * * *', this.Ping1DayLeft);
         this.createCronJob('30 0 * * * *', this.Ping3DaysLeft);
